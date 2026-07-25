@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt"
 import { v7 as uuidv7 } from "uuid"
 
-import type { Prisma } from "../src/index";
+import type { Prisma } from "../src/index"
 import { db } from "../src/index"
 
 const BCRYPT_COST = 12
@@ -104,7 +104,7 @@ async function main() {
 
   for (const r of rewards) {
     await db.reward.upsert({
-      where: { id: r.id! },
+      where: { name: r.name },
       update: {},
       create: r,
     })

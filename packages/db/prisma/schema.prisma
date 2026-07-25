@@ -230,6 +230,7 @@ model Reward {
 
   redemptions Redemption[]
 
+  @@unique([name])
   @@map("rewards")
 }
 
