@@ -27,6 +27,7 @@
 Internal recognition app. Employees give each other point-based kudos, react and comment on a live company feed, and redeem earned points for company-funded rewards.
 
 **Tech stack (locked in):**
+
 - **Monorepo:** pnpm workspaces + Turborepo
 - **Backend:** Node.js + TypeScript, Express, Prisma
 - **Frontend:** Vite + React + React Router + Ant Design 5 + TanStack Query + Zustand
@@ -37,6 +38,7 @@ Internal recognition app. Employees give each other point-based kudos, react and
 - **Tooling:** ESLint flat config, Prettier, Husky + lint-staged, commitlint
 
 **Three MVP use cases** (from the brief):
+
 1. Peer Recognition — send 10-50 point kudos with mandatory description, core value tag, and optional media (images or videos ≤3 min).
 2. Live Feed — global chronological stream with emoji reactions, comments (text + media), and real-time notifications for mentions.
 3. Reward Redemption — catalog of admin-managed rewards; double-spend-safe redemption flow.
@@ -101,13 +103,13 @@ Why `packages/db` as its own package: both `apps/api` and `apps/worker` need the
 
 ### 2.3 Process boundaries
 
-| Process | Responsibility | Why separate |
-|---|---|---|
-| `apps/api` | HTTP + WebSocket, DB writes, session, presigned URL issuance | Latency-sensitive, must stay responsive |
-| `apps/worker` | Video probe/thumbnail (ffmpeg), reconciliation CLI, orphan cleanup jobs | CPU-heavy; OOM in worker doesn't kill API |
-| Postgres | Source of truth (ledger + all business data) | — |
-| Redis | Sessions, Socket.io adapter (pub/sub), BullMQ queue | Multiple concerns, single infra |
-| S3 / MinIO | Blob storage (media) | Offloads bytes from Node processes entirely |
+| Process       | Responsibility                                                          | Why separate                                |
+| ------------- | ----------------------------------------------------------------------- | ------------------------------------------- |
+| `apps/api`    | HTTP + WebSocket, DB writes, session, presigned URL issuance            | Latency-sensitive, must stay responsive     |
+| `apps/worker` | Video probe/thumbnail (ffmpeg), reconciliation CLI, orphan cleanup jobs | CPU-heavy; OOM in worker doesn't kill API   |
+| Postgres      | Source of truth (ledger + all business data)                            | —                                           |
+| Redis         | Sessions, Socket.io adapter (pub/sub), BullMQ queue                     | Multiple concerns, single infra             |
+| S3 / MinIO    | Blob storage (media)                                                    | Offloads bytes from Node processes entirely |
 
 ### 2.4 Cross-cutting decisions
 
@@ -120,6 +122,7 @@ Why `packages/db` as its own package: both `apps/api` and `apps/worker` need the
 ### 2.5 API response envelope (standardized)
 
 **Success:**
+
 ```ts
 {
   data: T,                                    // the actual payload
@@ -128,6 +131,7 @@ Why `packages/db` as its own package: both `apps/api` and `apps/worker` need the
 ```
 
 **Error:**
+
 ```ts
 {
   error: {
@@ -171,6 +175,7 @@ Use `?include=` **only for relations that require extra queries** (comments, rea
 ### 3.2 Identity & auth
 
 **`users`** — profile + cached balances + timezone
+
 ```
 id                        uuid pk (v7)
 email                     citext unique not null
@@ -186,6 +191,7 @@ created_at, updated_at, deleted_at
 ```
 
 **`auth_identities`** — credentials, one row per provider per user
+
 ```
 id                  uuid pk
 user_id             uuid fk → users(id) on delete cascade
@@ -204,6 +210,7 @@ Sessions live in Redis (not a table).
 ### 3.3 Kudos
 
 **`kudos`**
+
 ```
 id              uuid pk
 sender_id       uuid fk → users(id)
@@ -222,6 +229,7 @@ index (created_at desc) where deleted_at is null      -- feed pagination
 ```
 
 **`kudo_media`** — many media per kudo (max 5 enforced app-side via `MAX_MEDIA_PER_KUDO` constant)
+
 ```
 id                  uuid pk
 kudo_id             uuid fk → kudos(id) on delete cascade
@@ -232,6 +240,7 @@ display_order       int not null
 ### 3.4 Reactions & comments
 
 **`reactions`** — emoji reactions on kudos
+
 ```
 id          uuid pk
 kudo_id     uuid fk → kudos(id) on delete cascade
@@ -244,6 +253,7 @@ index (kudo_id)
 ```
 
 **`comments`**
+
 ```
 id          uuid pk
 kudo_id     uuid fk → kudos(id) on delete cascade
@@ -255,6 +265,7 @@ index (kudo_id, created_at asc)
 ```
 
 **`comment_media`**
+
 ```
 id                  uuid pk
 comment_id          uuid fk → comments(id) on delete cascade
@@ -265,6 +276,7 @@ display_order       int
 ### 3.5 Points ledger + cache invariant
 
 **`points_transactions`** (append-only, source of truth)
+
 ```
 id              uuid pk
 user_id         uuid fk → users(id)             -- whose balance is changing
@@ -287,6 +299,7 @@ index (user_id, type, created_at desc)
 ### 3.6 Rewards & redemption
 
 **`rewards`** — admin-managed catalog
+
 ```
 id              uuid pk
 name            text not null
@@ -299,6 +312,7 @@ created_at, updated_at
 ```
 
 **`redemptions`**
+
 ```
 id                  uuid pk
 user_id             uuid fk → users(id)
@@ -317,6 +331,7 @@ index (status, created_at desc)                 -- admin PENDING queue
 ### 3.7 Notifications
 
 **`notifications`** — persisted so users see missed ones on reconnect
+
 ```
 id          uuid pk
 user_id     uuid fk → users(id)                 -- recipient
@@ -336,6 +351,7 @@ Realtime delivery is **best-effort push**; the DB row is source of truth. On WS 
 ### 3.8 Media
 
 **`media_assets`** — one row per uploaded file, referenced by kudos/comments
+
 ```
 id                  uuid pk
 uploaded_by         uuid fk → users(id)
@@ -463,13 +479,13 @@ apps/api/
 
 **Per-feature file conventions:**
 
-| File | Owns |
-|---|---|
-| `foo.routes.ts` | Express router — thin. Parses input via zod, calls service, maps to HTTP. |
-| `foo.service.ts` | Business logic. Transactions here. |
-| `foo.queries.ts` | DB queries only. All Prisma calls in one file per feature. |
-| `foo.schemas.ts` | Zod request/response schemas. Re-exports types from `packages/shared` when shared. |
-| `foo.service.test.ts` | Integration tests against real Postgres. |
+| File                  | Owns                                                                               |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| `foo.routes.ts`       | Express router — thin. Parses input via zod, calls service, maps to HTTP.          |
+| `foo.service.ts`      | Business logic. Transactions here.                                                 |
+| `foo.queries.ts`      | DB queries only. All Prisma calls in one file per feature.                         |
+| `foo.schemas.ts`      | Zod request/response schemas. Re-exports types from `packages/shared` when shared. |
+| `foo.service.test.ts` | Integration tests against real Postgres.                                           |
 
 ### 4.3 The "one writer" rule for points
 
@@ -479,7 +495,7 @@ apps/api/
 export class PointsService {
   async applyTransaction(
     input: PointsTransactionInput,
-    tx: Prisma.TransactionClient,     // caller owns the tx; we participate
+    tx: Prisma.TransactionClient, // caller owns the tx; we participate
   ): Promise<PointsTransaction> {
     // 1. INSERT points_transactions row
     // 2. UPDATE users cache column atomically
@@ -592,29 +608,30 @@ apps/web/
 
 **Frontend conventions:**
 
-| File | Owns |
-|---|---|
-| `*.api.ts` | Fetch calls. All network I/O for a feature. Returns typed data via shared zod schemas. |
-| `hooks/use*.ts` | TanStack Query hooks. Components never call `.api.ts` directly. |
-| `models/*.viewmodel.ts` | Type extensions specific to FE (e.g., `hasReactedByMe`). |
-| `types/*.local.ts` | FE-only enums/unions not on the wire. |
-| `*Page.tsx` | Top-level route component. |
-| `admin/` subfolder | Admin-only components wrapped in `<RequireRole role="ADMIN">`. |
+| File                    | Owns                                                                                   |
+| ----------------------- | -------------------------------------------------------------------------------------- |
+| `*.api.ts`              | Fetch calls. All network I/O for a feature. Returns typed data via shared zod schemas. |
+| `hooks/use*.ts`         | TanStack Query hooks. Components never call `.api.ts` directly.                        |
+| `models/*.viewmodel.ts` | Type extensions specific to FE (e.g., `hasReactedByMe`).                               |
+| `types/*.local.ts`      | FE-only enums/unions not on the wire.                                                  |
+| `*Page.tsx`             | Top-level route component.                                                             |
+| `admin/` subfolder      | Admin-only components wrapped in `<RequireRole role="ADMIN">`.                         |
 
 ### 4.5 State management
 
-| Kind of state | Tool |
-|---|---|
-| Server data (from API) | **TanStack Query** — 95% of app state |
-| Global UI state (sidebar collapse, theme) | **Zustand** — one small store |
-| Local component state | `useState` / `useReducer` |
-| Session (`me`) | TanStack Query with key `['me']` — `useCurrentUser()` |
+| Kind of state                             | Tool                                                  |
+| ----------------------------------------- | ----------------------------------------------------- |
+| Server data (from API)                    | **TanStack Query** — 95% of app state                 |
+| Global UI state (sidebar collapse, theme) | **Zustand** — one small store                         |
+| Local component state                     | `useState` / `useReducer`                             |
+| Session (`me`)                            | TanStack Query with key `['me']` — `useCurrentUser()` |
 
 No Redux. Reasoning: TanStack Query handles all server state including infinite queries, optimistic updates, cache invalidation. Zustand covers the small amount of global UI state. Redux adds boilerplate without capability gain for this app.
 
 ### 4.6 HTTP client
 
 Thin wrapper around **native `fetch`**. No axios (past CVEs, bundle weight, xhr baggage). ~30 lines handling:
+
 - Auto-inclusion of credentials for session cookies
 - Auto-parsing of the response envelope
 - Auto-throwing typed `ApiError`
@@ -634,7 +651,7 @@ export const queryKeys = {
     byId: (id: string) => ["users", id] as const,
   },
 
-  feed: ["feed"] as const,              // single global feed, no filters, infinite scroll
+  feed: ["feed"] as const, // single global feed, no filters, infinite scroll
 
   kudos: {
     all: ["kudos"] as const,
@@ -671,25 +688,26 @@ export const queryKeys = {
 
 ### 4.8 Cache invalidation matrix
 
-| Mutation | Invalidates |
-|---|---|
-| Send kudo | `feed`, `points.balance`, `points.history`, `me` |
-| React to kudo | `kudos.reactions(kudoId)` (optimistic first) |
-| Comment on kudo | `kudos.comments(kudoId)`, `kudos.detail(kudoId)` |
-| Redeem reward | `points.balance`, `points.history`, `redemptions.mine`, `rewards.detail(rewardId)`, `me` |
-| Admin create/update reward | `rewards.all` |
-| Mark notification read | `notifications.unreadCount` + optimistic on `notifications.list` |
-| Mark all read | `notifications.all` |
-| Update profile | `me` |
+| Mutation                   | Invalidates                                                                              |
+| -------------------------- | ---------------------------------------------------------------------------------------- |
+| Send kudo                  | `feed`, `points.balance`, `points.history`, `me`                                         |
+| React to kudo              | `kudos.reactions(kudoId)` (optimistic first)                                             |
+| Comment on kudo            | `kudos.comments(kudoId)`, `kudos.detail(kudoId)`                                         |
+| Redeem reward              | `points.balance`, `points.history`, `redemptions.mine`, `rewards.detail(rewardId)`, `me` |
+| Admin create/update reward | `rewards.all`                                                                            |
+| Mark notification read     | `notifications.unreadCount` + optimistic on `notifications.list`                         |
+| Mark all read              | `notifications.all`                                                                      |
+| Update profile             | `me`                                                                                     |
 
 **Socket events → invalidation:**
-| Event | Invalidates |
-|---|---|
-| `kudo:created` | `feed` |
-| `kudo:reaction:added/removed` | `kudos.reactions(kudoId)` |
-| `kudo:comment:added` | `kudos.comments(kudoId)`, `kudos.detail(kudoId)` |
-| `notification:new` | `notifications.list`, `notifications.unreadCount` + optional toast |
-| `media:status` | `["media", mediaId]` |
+
+| Event                         | Invalidates                                                        |
+| ----------------------------- | ------------------------------------------------------------------ |
+| `kudo:created`                | `feed`                                                             |
+| `kudo:reaction:added/removed` | `kudos.reactions(kudoId)`                                          |
+| `kudo:comment:added`          | `kudos.comments(kudoId)`, `kudos.detail(kudoId)`                   |
+| `notification:new`            | `notifications.list`, `notifications.unreadCount` + optional toast |
+| `media:status`                | `["media", mediaId]`                                               |
 
 **Reset on session change:** `queryClient.clear()` + `socket.disconnect()` on logout/session expiry. Prevents cross-user data leakage.
 
@@ -755,17 +773,18 @@ Both `apps/api` and `apps/worker` depend on `packages/db`. Migrations run via `p
 
 ### 4.12 Tooling configuration
 
-| Tool | Choice |
-|---|---|
-| ESLint | Flat config (`eslint.config.js`) |
-| ESLint preset | `@typescript-eslint/recommended-type-checked` + `eslint-plugin-react-hooks` + `eslint-config-prettier` |
-| Import ordering | `eslint-plugin-import` (`import/order` grouped, `import/no-cycle`, `import/no-unused-modules`) |
-| Commit convention | commitlint with allowed types: `feat, fix, refactor, chore, doc` |
-| Line width | 80 (Prettier default) |
-| Semicolons | **No** — `"semi": false` |
-| Quotes | **Double** — `"singleQuote": false` |
+| Tool              | Choice                                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------------------------ |
+| ESLint            | Flat config (`eslint.config.js`)                                                                       |
+| ESLint preset     | `@typescript-eslint/recommended-type-checked` + `eslint-plugin-react-hooks` + `eslint-config-prettier` |
+| Import ordering   | `eslint-plugin-import` (`import/order` grouped, `import/no-cycle`, `import/no-unused-modules`)         |
+| Commit convention | commitlint with allowed types: `feat, fix, refactor, chore, doc`                                       |
+| Line width        | 80 (Prettier default)                                                                                  |
+| Semicolons        | **No** — `"semi": false`                                                                               |
+| Quotes            | **Double** — `"singleQuote": false`                                                                    |
 
 Prettier config:
+
 ```json
 {
   "semi": false,
@@ -776,6 +795,7 @@ Prettier config:
 ```
 
 Husky:
+
 - `pre-commit` → `lint-staged` (prettier + eslint --fix on staged files, type-check on changed package)
 - `commit-msg` → commitlint
 
@@ -869,11 +889,13 @@ Client generates `idempotencyKey` when the confirmation modal opens; discards on
 ### 5.5 Notifications routing (when B sends kudos to A)
 
 **Persistent (row + bell/toast):**
+
 - **A** → `KUDO_RECEIVED` (always)
 - **B** → nothing (already got success toast)
 - **@mentions in message** → `MENTION` per mentioned user
 
 **Broadcast (no rows, cache invalidation only):**
+
 - Everyone in `feed` room → `kudo:created` (~200 bytes, IDs only)
 - A specifically → `notification:new`
 - Each @mention → `notification:new`
@@ -901,10 +923,10 @@ If B kudos A AND @mentions A, A gets both notifications for MVP. Dedup deferred 
 
 **Rooms:**
 
-| Room | Who joins | Purpose |
-|---|---|---|
-| `user:${userId}` | The user, on every device (joined at handshake) | Targeted delivery (notifications) |
-| `feed` | Everyone authenticated (joined at handshake) | Broadcast (`kudo:created`) |
+| Room             | Who joins                                                               | Purpose                                          |
+| ---------------- | ----------------------------------------------------------------------- | ------------------------------------------------ |
+| `user:${userId}` | The user, on every device (joined at handshake)                         | Targeted delivery (notifications)                |
+| `feed`           | Everyone authenticated (joined at handshake)                            | Broadcast (`kudo:created`)                       |
 | `kudo:${kudoId}` | Anyone viewing that kudo's detail page (on-demand via `kudo:subscribe`) | Fine-grained updates (new reaction, new comment) |
 
 ### 6.2 Event contracts
@@ -912,12 +934,14 @@ If B kudos A AND @mentions A, A gets both notifications for MVP. Dedup deferred 
 Defined once in `packages/shared/src/socket/events.ts` as zod schemas + typed event map. Client-side handlers are typed against this map — no drift.
 
 **Server → client:**
+
 - `kudo:created` (to `feed` room)
 - `kudo:reaction:added`, `kudo:reaction:removed`, `kudo:comment:added` (to `kudo:${id}` room)
 - `notification:new` (to `user:${id}` room)
 - `media:status` (to uploader's `user:${id}` room)
 
 **Client → server (few):**
+
 - `kudo:subscribe { kudoId }` — join kudo detail room on page mount
 - `kudo:unsubscribe { kudoId }` — leave on unmount
 
@@ -926,6 +950,7 @@ Defined once in `packages/shared/src/socket/events.ts` as zod schemas + typed ev
 The **only** class that talks to Socket.io. Application code never calls `io.emit` directly (enforced by ESLint `no-restricted-imports`).
 
 Two shapes:
+
 - **Persist + emit** (`notifyMention`, `notifyKudoReceived`, `notifyRedemptionStatus`) — accepts a `tx?` for persistence inside caller's transaction, then emits post-commit
 - **Broadcast only** (`broadcastNewKudo`, `broadcastReaction`, `broadcastCommentAdded`, `emitMediaStatus`) — no persistence
 
@@ -936,6 +961,7 @@ The pathological "crashed between commit and emit" case is acceptable at MVP mat
 ### 6.4 Reactions notification decision
 
 **Reactions do NOT create notification rows.** Rationale:
+
 - Highest-volume interaction type — 20-50 reactions per popular kudo → notification table explosion
 - Bell noise — users would learn to ignore, hiding real notifications
 - Notification center clutter
@@ -949,6 +975,7 @@ Alternative (deferred): aggregated view ("5 people reacted to your kudo") comput
 ### 6.6 Reconnect + missed-message recovery
 
 Three overlapping mechanisms:
+
 1. On `socket.on('connect', ...)` reconnect: invalidate `feed` + `notifications.all`
 2. Bell badge 60-second poll safety net
 3. TanStack Query `refetchOnReconnect` + `refetchOnWindowFocus`
@@ -979,24 +1006,25 @@ Central Express error middleware maps `AppError` → typed envelope response, `Z
 
 **Three-layer defense on every money-adjacent write:**
 
-| Layer | Guards against |
-|---|---|
-| **Client idempotency key** (uuid, per-intent, in React state) | Network retries, double-clicks in one tab |
-| **Unique DB constraint** on `(user_id, idempotency_key)` | Race between concurrent processes with same key |
-| **`SELECT ... FOR UPDATE`** on the row being decremented | Multi-device concurrent intents (2 tabs, phone+desktop) |
+| Layer                                                         | Guards against                                          |
+| ------------------------------------------------------------- | ------------------------------------------------------- |
+| **Client idempotency key** (uuid, per-intent, in React state) | Network retries, double-clicks in one tab               |
+| **Unique DB constraint** on `(user_id, idempotency_key)`      | Race between concurrent processes with same key         |
+| **`SELECT ... FOR UPDATE`** on the row being decremented      | Multi-device concurrent intents (2 tabs, phone+desktop) |
 
 **Additional invariants:**
+
 - Ledger recomputation inside the tx makes the check authoritative even if cache drifted
 - Fixed lock ordering (`users` → `rewards`) prevents deadlocks
 - `PointsService.applyTransaction` is single writer for cache + ledger
 
 **Write path summary:**
 
-| Write | Locked rows | Idempotency key | Ledger entries |
-|---|---|---|---|
-| Send kudo | sender's `users` row | Yes (`kudos.idempotency_key`) | GIVE + RECEIVE |
-| Redeem reward | receiver's `users` row + `rewards` row | Yes (`redemptions.idempotency_key`) | REDEEM |
-| Admin adjust | target user's `users` row | No (low frequency, low collision) | ADJUST |
+| Write         | Locked rows                            | Idempotency key                     | Ledger entries |
+| ------------- | -------------------------------------- | ----------------------------------- | -------------- |
+| Send kudo     | sender's `users` row                   | Yes (`kudos.idempotency_key`)       | GIVE + RECEIVE |
+| Redeem reward | receiver's `users` row + `rewards` row | Yes (`redemptions.idempotency_key`) | REDEEM         |
+| Admin adjust  | target user's `users` row              | No (low frequency, low collision)   | ADJUST         |
 
 ### 7.3 Authentication & sessions
 
@@ -1041,14 +1069,14 @@ Central Express error middleware maps `AppError` → typed envelope response, `Z
 
 Redis-backed via `rate-limiter-flexible`:
 
-| Endpoint | Limit |
-|---|---|
-| `POST /auth/login` | 5 / 15min per IP + per email |
-| `POST /auth/register` | 3 / hour per IP |
-| `POST /kudos` | 30 / hour per user |
-| `POST /redemptions` | 10 / hour per user |
-| `POST /media/*/presign`, `POST /media/mpu/*` | 100 / hour per user |
-| `POST /kudos/:id/reactions` | 60 / minute per user |
+| Endpoint                                     | Limit                        |
+| -------------------------------------------- | ---------------------------- |
+| `POST /auth/login`                           | 5 / 15min per IP + per email |
+| `POST /auth/register`                        | 3 / hour per IP              |
+| `POST /kudos`                                | 30 / hour per user           |
+| `POST /redemptions`                          | 10 / hour per user           |
+| `POST /media/*/presign`, `POST /media/mpu/*` | 100 / hour per user          |
+| `POST /kudos/:id/reactions`                  | 60 / minute per user         |
 
 429 responses include `Retry-After` header + toast: "Please wait a moment before trying again."
 
@@ -1095,8 +1123,16 @@ it("prevents double-spend when 2 concurrent requests race", async () => {
   const reward = await makeReward({ costPoints: 150, stock: null })
 
   const results = await Promise.allSettled([
-    redemptions.redeem({ userId: user.id, rewardId: reward.id, idempotencyKey: uuidv7() }),
-    redemptions.redeem({ userId: user.id, rewardId: reward.id, idempotencyKey: uuidv7() }),
+    redemptions.redeem({
+      userId: user.id,
+      rewardId: reward.id,
+      idempotencyKey: uuidv7(),
+    }),
+    redemptions.redeem({
+      userId: user.id,
+      rewardId: reward.id,
+      idempotencyKey: uuidv7(),
+    }),
   ])
 
   expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1)
@@ -1114,6 +1150,7 @@ it("prevents double-spend when 2 concurrent requests race", async () => {
 **Every money-mutation test ends with `reconcileUser === 0 drift`.** Catches "test passed but ledger and cache silently disagreed."
 
 Scenarios covered:
+
 - Double-spend (concurrent requests different keys)
 - Idempotency replay (same key returns same result)
 - Last-in-stock race (2 users, 1 hoodie)
@@ -1288,30 +1325,30 @@ Not in MVP. Prioritized later based on real user feedback.
 
 ## 11. Key Decisions Log
 
-| Decision | Chosen | Rationale |
-|---|---|---|
-| Auth model | Email + password, 2 roles | MVP; SSO/MFA hooks in schema |
-| Media storage | S3-compatible + presigned URLs | Server never touches bytes, no OOM |
-| Video upload | S3 Multipart Upload + IndexedDB resume | User explicitly opted in vs simpler single-PUT |
-| Realtime | Socket.io + Redis adapter | Rooms, reconnect, matches stack requirement |
-| Realtime service pattern | Domain `NotificationService`, not transport adapter | Clarity + testability without over-abstraction |
-| Monorepo | pnpm workspaces + Turborepo | Industry default 2026 |
-| ORM | Prisma + Postgres | User preference; DX + typed schema |
-| Frontend | Vite + React + React Router + AntD 5 | Internal app, no SSR need |
-| API style | REST + WS with typed variants (Summary/Detail) | Type safety over GraphQL-style field picking |
-| ORM query file naming | `.queries.ts` | Reads naturally |
-| Session | Redis-backed | Shared with Socket.io handshake |
-| Points model | Ledger (source of truth) + cached columns | Auditability + fast reads |
-| Reconciliation | Function in MVP, scheduler deferred | Observability without ops cost |
-| State management (FE) | TanStack Query + Zustand, no Redux | Right size for this app |
-| HTTP client | Native fetch wrapper | No axios (bundle, past CVEs) |
-| Testing | Vitest + Testcontainers + MSW | Real integration for money paths |
-| Concurrency defense | Idempotency key + unique constraint + FOR UPDATE | Three-layer defense |
-| Reactions notifications | None persisted | Volume + noise |
-| Feed | Single global chronological, no filters | Matches use case; no scope creep |
-| Notifications persist-first | Yes, then broadcast post-commit | Correctness over convenience |
-| Admin fulfillment | Manual (2 endpoints, 1 admin page) | Real-world action; automation is post-MVP |
-| Response format | Standard envelope with `data`/`error`/`notifications` | Consistent toast handling |
-| Timestamps | UTC in DB, display per `users.timezone`, monthly window per `COMPANY_TIMEZONE` | Simple for MVP |
-| Core values | Postgres enum in MVP, table for future | Type safety now, admin editing later |
-| Compose form persistence | localStorage | UX win for tiny cost |
+| Decision                    | Chosen                                                                         | Rationale                                      |
+| --------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------- |
+| Auth model                  | Email + password, 2 roles                                                      | MVP; SSO/MFA hooks in schema                   |
+| Media storage               | S3-compatible + presigned URLs                                                 | Server never touches bytes, no OOM             |
+| Video upload                | S3 Multipart Upload + IndexedDB resume                                         | User explicitly opted in vs simpler single-PUT |
+| Realtime                    | Socket.io + Redis adapter                                                      | Rooms, reconnect, matches stack requirement    |
+| Realtime service pattern    | Domain `NotificationService`, not transport adapter                            | Clarity + testability without over-abstraction |
+| Monorepo                    | pnpm workspaces + Turborepo                                                    | Industry default 2026                          |
+| ORM                         | Prisma + Postgres                                                              | User preference; DX + typed schema             |
+| Frontend                    | Vite + React + React Router + AntD 5                                           | Internal app, no SSR need                      |
+| API style                   | REST + WS with typed variants (Summary/Detail)                                 | Type safety over GraphQL-style field picking   |
+| ORM query file naming       | `.queries.ts`                                                                  | Reads naturally                                |
+| Session                     | Redis-backed                                                                   | Shared with Socket.io handshake                |
+| Points model                | Ledger (source of truth) + cached columns                                      | Auditability + fast reads                      |
+| Reconciliation              | Function in MVP, scheduler deferred                                            | Observability without ops cost                 |
+| State management (FE)       | TanStack Query + Zustand, no Redux                                             | Right size for this app                        |
+| HTTP client                 | Native fetch wrapper                                                           | No axios (bundle, past CVEs)                   |
+| Testing                     | Vitest + Testcontainers + MSW                                                  | Real integration for money paths               |
+| Concurrency defense         | Idempotency key + unique constraint + FOR UPDATE                               | Three-layer defense                            |
+| Reactions notifications     | None persisted                                                                 | Volume + noise                                 |
+| Feed                        | Single global chronological, no filters                                        | Matches use case; no scope creep               |
+| Notifications persist-first | Yes, then broadcast post-commit                                                | Correctness over convenience                   |
+| Admin fulfillment           | Manual (2 endpoints, 1 admin page)                                             | Real-world action; automation is post-MVP      |
+| Response format             | Standard envelope with `data`/`error`/`notifications`                          | Consistent toast handling                      |
+| Timestamps                  | UTC in DB, display per `users.timezone`, monthly window per `COMPANY_TIMEZONE` | Simple for MVP                                 |
+| Core values                 | Postgres enum in MVP, table for future                                         | Type safety now, admin editing later           |
+| Compose form persistence    | localStorage                                                                   | UX win for tiny cost                           |

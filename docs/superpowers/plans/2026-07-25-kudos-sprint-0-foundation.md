@@ -168,9 +168,11 @@ T1 monorepo scaffold
 ## Task 1: Monorepo scaffold + root tooling
 
 **Files:**
+
 - Create: `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `tsconfig.base.json`, `.gitignore`, `.env.example`, `eslint.config.js`, `.prettierrc.json`, `.prettierignore`, `commitlint.config.js`, `.husky/pre-commit`, `.husky/commit-msg`, `.nvmrc`
 
 **Interfaces:**
+
 - Consumes: nothing.
 - Produces: `pnpm install` works. `pnpm lint` runs ESLint across the empty workspace and exits 0. `pnpm format` runs Prettier. Commit hooks fire.
 
@@ -290,13 +292,8 @@ packages:
     "typescript-eslint": "^8.8.0"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "prettier --write",
-      "eslint --fix"
-    ],
-    "*.{json,md,yml,yaml}": [
-      "prettier --write"
-    ]
+    "*.{ts,tsx,js,jsx}": ["prettier --write", "eslint --fix"],
+    "*.{json,md,yml,yaml}": ["prettier --write"]
   }
 }
 ```
@@ -423,7 +420,14 @@ export default [
       "import/order": [
         "error",
         {
-          groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+          ],
           "newlines-between": "always",
           alphabetize: { order: "asc" },
         },
@@ -444,11 +448,7 @@ export default [
 export default {
   extends: ["@commitlint/config-conventional"],
   rules: {
-    "type-enum": [
-      2,
-      "always",
-      ["feat", "fix", "refactor", "chore", "doc"],
-    ],
+    "type-enum": [2, "always", ["feat", "fix", "refactor", "chore", "doc"]],
     "subject-case": [0],
   },
 }
@@ -509,11 +509,13 @@ Expected: commit-msg hook accepts `chore:` type. Pre-commit runs (no staged file
 ## Task 2: Shared packages foundation (`@kudos/config`, `@kudos/shared`, `@kudos/db` skeleton)
 
 **Files:**
+
 - Create: `packages/config/{package.json,tsconfig.json,src/env.ts,src/index.ts}`
 - Create: `packages/shared/{package.json,tsconfig.json,src/index.ts,src/constants.ts,src/api-envelope.ts,src/errors.ts,src/socket/events.ts,src/auth/index.ts,src/auth/schemas.ts}`
 - Create: `packages/db/{package.json,tsconfig.json,src/index.ts}` (empty schema.prisma added in T4)
 
 **Interfaces:**
+
 - Consumes: nothing new.
 - Produces:
   - `import { env } from "@kudos/config"` — zod-validated env object, throws on invalid.
@@ -906,9 +908,11 @@ git commit -m "feat(shared): add config, shared, and db package scaffolds"
 ## Task 3: Docker Compose (Postgres 16, Redis 7, MinIO)
 
 **Files:**
+
 - Create: `docker-compose.yml`
 
 **Interfaces:**
+
 - Consumes: `.env` (`DATABASE_URL`, `REDIS_URL`, `S3_*`).
 - Produces: `docker compose up -d` brings up services on ports 5432 (Postgres), 6379 (Redis), 9000 (MinIO API), 9001 (MinIO console). Named volumes persist data across restarts.
 
@@ -1021,11 +1025,13 @@ git commit -m "chore(infra): add docker-compose for postgres, redis, minio"
 ## Task 4: Prisma schema + initial migration + seed script
 
 **Files:**
+
 - Create: `packages/db/prisma/schema.prisma`
 - Create: `packages/db/prisma/seed.ts`
 - Auto-generated: `packages/db/prisma/migrations/<ts>_init/migration.sql`
 
 **Interfaces:**
+
 - Consumes: `DATABASE_URL` from `@kudos/config`, running Postgres from T3.
 - Produces:
   - All 12 tables from spec Section 3 exist.
@@ -1444,10 +1450,26 @@ async function main() {
       role: "ADMIN" as const,
       password: "adminpass123",
     },
-    { email: "alice@test.local", displayName: "Alice Nguyen", password: "password123" },
-    { email: "bob@test.local", displayName: "Bob Tran", password: "password123" },
-    { email: "charlie@test.local", displayName: "Charlie Le", password: "password123" },
-    { email: "diana@test.local", displayName: "Diana Pham", password: "password123" },
+    {
+      email: "alice@test.local",
+      displayName: "Alice Nguyen",
+      password: "password123",
+    },
+    {
+      email: "bob@test.local",
+      displayName: "Bob Tran",
+      password: "password123",
+    },
+    {
+      email: "charlie@test.local",
+      displayName: "Charlie Le",
+      password: "password123",
+    },
+    {
+      email: "diana@test.local",
+      displayName: "Diana Pham",
+      password: "password123",
+    },
     { email: "eve@test.local", displayName: "Eve Vo", password: "password123" },
   ]
 
@@ -1468,7 +1490,9 @@ async function main() {
         },
       })
 
-      const user = await tx.user.findUniqueOrThrow({ where: { email: u.email } })
+      const user = await tx.user.findUniqueOrThrow({
+        where: { email: u.email },
+      })
 
       await tx.authIdentity.upsert({
         where: {
@@ -1571,6 +1595,7 @@ git commit -m "feat(db): add prisma schema, migrations, check constraints, and s
 ## Task 5: `apps/api` skeleton (Express app, middleware, `/health`)
 
 **Files:**
+
 - Create: `apps/api/{package.json, tsconfig.json, vitest.config.ts}`
 - Create: `apps/api/src/{main.ts, app.ts}`
 - Create: `apps/api/src/common/{errors.ts, logger.ts, prisma-client.ts, redis-client.ts, request-context.ts}`
@@ -1578,6 +1603,7 @@ git commit -m "feat(db): add prisma schema, migrations, check constraints, and s
 - Create: `apps/api/src/features/health/health.routes.ts`
 
 **Interfaces:**
+
 - Consumes: `@kudos/config`, `@kudos/db`, `@kudos/shared`.
 - Produces:
   - `pnpm --filter @kudos/api dev` starts server on `env.PORT` (4000).
@@ -1814,7 +1840,10 @@ export function correlationId() {
     const id = (req.headers["x-correlation-id"] as string) ?? uuidv7()
     res.setHeader("X-Correlation-Id", id)
     requestContext.run(
-      { correlationId: id, userId: (req.session as { userId?: string })?.userId },
+      {
+        correlationId: id,
+        userId: (req.session as { userId?: string })?.userId,
+      },
       next,
     )
   }
@@ -1845,7 +1874,11 @@ export function errorHandler() {
         fields[issue.path.join(".") || "_"] = issue.message
       }
       const body: ErrorResponse = {
-        error: { code: ErrorCode.VALIDATION_FAILED, message: "Validation failed", fields },
+        error: {
+          code: ErrorCode.VALIDATION_FAILED,
+          message: "Validation failed",
+          fields,
+        },
       }
       res.status(422).json(body)
       return
@@ -1874,7 +1907,10 @@ export function errorHandler() {
 import type { NextFunction, Request, Response } from "express"
 import type { ZodSchema } from "zod"
 
-export function validate<T>(schema: ZodSchema<T>, source: "body" | "query" | "params" = "body") {
+export function validate<T>(
+  schema: ZodSchema<T>,
+  source: "body" | "query" | "params" = "body",
+) {
   return (req: Request, _res: Response, next: NextFunction) => {
     const parsed = schema.safeParse(req[source])
     if (!parsed.success) {
@@ -1976,7 +2012,10 @@ export const healthRouter = Router()
 healthRouter.get("/", async (_req: Request, res: Response) => {
   const [dbOk, redisOk] = await Promise.all([
     db.$queryRaw`SELECT 1`.then(() => true).catch(() => false),
-    redis.ping().then((r) => r === "PONG").catch(() => false),
+    redis
+      .ping()
+      .then((r) => r === "PONG")
+      .catch(() => false),
   ])
 
   const overall = dbOk && redisOk
@@ -2118,6 +2157,7 @@ git commit -m "feat(api): add express app skeleton with sessions, health check, 
 ## Task 6: Auth backend (register, login, logout, `/me`) + integration tests
 
 **Files:**
+
 - Create: `apps/api/src/features/auth/{auth.routes.ts, auth.service.ts, auth.queries.ts, auth.schemas.ts, auth.service.test.ts}`
 - Create: `apps/api/src/features/users/{users.routes.ts, users.queries.ts}`
 - Create: `apps/api/test/{setup.ts, fixtures/user.ts, helpers/http-client.ts}`
@@ -2125,6 +2165,7 @@ git commit -m "feat(api): add express app skeleton with sessions, health check, 
 - Modify: `apps/api/src/app.ts` — mount auth and users routers
 
 **Interfaces:**
+
 - Consumes: `req.session`, `db`, `RegisterInput`, `LoginInput`, `MeResponse` from `@kudos/shared`.
 - Produces:
   - `POST /auth/register` → creates user + PASSWORD identity, logs in, returns `MeResponse`.
@@ -2137,7 +2178,11 @@ git commit -m "feat(api): add express app skeleton with sessions, health check, 
 - [ ] **Step 1: Write `apps/api/src/features/auth/auth.schemas.ts`**
 
 ```ts
-export { LoginInputSchema, RegisterInputSchema, MeResponseSchema } from "@kudos/shared"
+export {
+  LoginInputSchema,
+  RegisterInputSchema,
+  MeResponseSchema,
+} from "@kudos/shared"
 export type { LoginInput, RegisterInput, MeResponse } from "@kudos/shared"
 ```
 
@@ -2200,7 +2245,11 @@ import bcrypt from "bcrypt"
 
 import { ErrorCode, type MeResponse } from "@kudos/shared"
 
-import { AppError, ConflictError, UnauthenticatedError } from "../../common/errors"
+import {
+  AppError,
+  ConflictError,
+  UnauthenticatedError,
+} from "../../common/errors"
 import { db } from "../../common/prisma-client"
 
 import {
@@ -2229,11 +2278,19 @@ export const authService = {
     const user = await findUserByEmail(input.email)
     const identity = user?.authIdentities[0]
     if (!user || !identity?.passwordHash) {
-      throw new AppError(ErrorCode.INVALID_CREDENTIALS, 401, "Invalid email or password")
+      throw new AppError(
+        ErrorCode.INVALID_CREDENTIALS,
+        401,
+        "Invalid email or password",
+      )
     }
     const ok = await bcrypt.compare(input.password, identity.passwordHash)
     if (!ok) {
-      throw new AppError(ErrorCode.INVALID_CREDENTIALS, 401, "Invalid email or password")
+      throw new AppError(
+        ErrorCode.INVALID_CREDENTIALS,
+        401,
+        "Invalid email or password",
+      )
     }
     return toMeResponse(user)
   },
@@ -2286,35 +2343,43 @@ import {
 
 export const authRouter = Router()
 
-authRouter.post("/register", validate(RegisterInputSchema), async (req, res, next) => {
-  try {
-    const input = validated<RegisterInput>(req)
-    const me = await authService.register(input)
-    req.session.userId = me.id
-    req.session.role = me.role
-    res.status(201).json({ data: me })
-  } catch (e) {
-    next(e)
-  }
-})
-
-authRouter.post("/login", validate(LoginInputSchema), async (req, res, next) => {
-  try {
-    const input = validated<LoginInput>(req)
-    const me = await authService.login(input)
-    req.session.regenerate((err) => {
-      if (err) return next(err)
+authRouter.post(
+  "/register",
+  validate(RegisterInputSchema),
+  async (req, res, next) => {
+    try {
+      const input = validated<RegisterInput>(req)
+      const me = await authService.register(input)
       req.session.userId = me.id
       req.session.role = me.role
-      req.session.save((err2) => {
-        if (err2) return next(err2)
-        res.json({ data: me })
+      res.status(201).json({ data: me })
+    } catch (e) {
+      next(e)
+    }
+  },
+)
+
+authRouter.post(
+  "/login",
+  validate(LoginInputSchema),
+  async (req, res, next) => {
+    try {
+      const input = validated<LoginInput>(req)
+      const me = await authService.login(input)
+      req.session.regenerate((err) => {
+        if (err) return next(err)
+        req.session.userId = me.id
+        req.session.role = me.role
+        req.session.save((err2) => {
+          if (err2) return next(err2)
+          res.json({ data: me })
+        })
       })
-    })
-  } catch (e) {
-    next(e)
-  }
-})
+    } catch (e) {
+      next(e)
+    }
+  },
+)
 
 authRouter.post("/logout", async (req, res, next) => {
   req.session.destroy((err) => {
@@ -2527,14 +2592,11 @@ import { makeUser } from "../../../test/fixtures/user"
 describe("auth routes", () => {
   it("registers a new user, sets a session, and returns MeResponse", async () => {
     const agent = makeAgent()
-    const res = await agent
-      .post("/auth/register")
-      .set(XHR)
-      .send({
-        email: "newbie@test.local",
-        password: "supersecret1",
-        displayName: "Newbie",
-      })
+    const res = await agent.post("/auth/register").set(XHR).send({
+      email: "newbie@test.local",
+      password: "supersecret1",
+      displayName: "Newbie",
+    })
 
     expect(res.status).toBe(201)
     expect(res.body.data).toMatchObject({
@@ -2553,10 +2615,11 @@ describe("auth routes", () => {
   it("rejects duplicate email with EMAIL_TAKEN", async () => {
     await makeUser({ email: "dup@test.local" })
     const agent = makeAgent()
-    const res = await agent
-      .post("/auth/register")
-      .set(XHR)
-      .send({ email: "dup@test.local", password: "supersecret1", displayName: "X" })
+    const res = await agent.post("/auth/register").set(XHR).send({
+      email: "dup@test.local",
+      password: "supersecret1",
+      displayName: "X",
+    })
 
     expect(res.status).toBe(409)
     expect(res.body.error.code).toBe("EMAIL_TAKEN")
@@ -2602,9 +2665,11 @@ describe("auth routes", () => {
 
   it("rejects requests missing X-Requested-With", async () => {
     const agent = makeAgent()
-    const res = await agent
-      .post("/auth/register")
-      .send({ email: "no-xhr@test.local", password: "supersecret1", displayName: "X" })
+    const res = await agent.post("/auth/register").send({
+      email: "no-xhr@test.local",
+      password: "supersecret1",
+      displayName: "X",
+    })
     expect(res.status).toBe(403)
     expect(res.body.error.code).toBe("FORBIDDEN")
   })
@@ -2671,6 +2736,7 @@ git commit -m "feat(auth): add register/login/logout/me with redis-backed sessio
 ## Task 7: `apps/web` skeleton (Vite, providers, fetch client, layouts)
 
 **Files:**
+
 - Create: `apps/web/{package.json, tsconfig.json, tsconfig.node.json, vite.config.ts, index.html, public/favicon.svg}`
 - Create: `apps/web/src/{main.tsx, App.tsx}`
 - Create: `apps/web/src/app/{routes.tsx, layout/{AppShell.tsx, AuthLayout.tsx}, providers/{QueryProvider.tsx, AntdProvider.tsx, SocketProvider.tsx}}`
@@ -2678,6 +2744,7 @@ git commit -m "feat(auth): add register/login/logout/me with redis-backed sessio
 - Create: `apps/web/src/styles/theme.ts`
 
 **Interfaces:**
+
 - Consumes: `@kudos/shared` (types + schemas + error codes).
 - Produces:
   - `pnpm --filter @kudos/web dev` starts Vite on 5173, proxies `/auth`, `/users`, `/health`, `/socket.io` to `http://localhost:4000`.
@@ -2852,7 +2919,10 @@ export type ApiFetchOptions = Omit<RequestInit, "body"> & {
   signal?: AbortSignal
 }
 
-export async function apiFetch<T>(path: string, opts: ApiFetchOptions = {}): Promise<T> {
+export async function apiFetch<T>(
+  path: string,
+  opts: ApiFetchOptions = {},
+): Promise<T> {
   const { body, headers, signal, ...rest } = opts
   const isForm = body instanceof FormData
   const res = await fetch(path, {
@@ -2860,19 +2930,25 @@ export async function apiFetch<T>(path: string, opts: ApiFetchOptions = {}): Pro
     signal: signal ?? AbortSignal.timeout(30_000),
     headers: {
       "X-Requested-With": "XMLHttpRequest",
-      ...(isForm ? {} : body !== undefined ? { "Content-Type": "application/json" } : {}),
+      ...(isForm
+        ? {}
+        : body !== undefined
+          ? { "Content-Type": "application/json" }
+          : {}),
       ...headers,
     },
-    body: isForm ? (body as FormData) : body !== undefined ? JSON.stringify(body) : undefined,
+    body: isForm
+      ? (body as FormData)
+      : body !== undefined
+        ? JSON.stringify(body)
+        : undefined,
     ...rest,
   })
 
   if (res.status === 204) return undefined as T
 
   const raw = (await res.json().catch(() => null)) as
-    | SuccessResponse<T>
-    | ErrorResponse
-    | null
+    SuccessResponse<T> | ErrorResponse | null
 
   if (res.status === 401) {
     window.dispatchEvent(new CustomEvent("session-expired"))
@@ -2885,7 +2961,12 @@ export async function apiFetch<T>(path: string, opts: ApiFetchOptions = {}): Pro
   pushNotifications(raw.notifications)
 
   if ("error" in raw) {
-    throw new ApiError(raw.error.code, res.status, raw.error.message, raw.error.fields)
+    throw new ApiError(
+      raw.error.code,
+      res.status,
+      raw.error.message,
+      raw.error.fields,
+    )
   }
   return raw.data
 }
@@ -2952,7 +3033,11 @@ export function useCurrentUser() {
       try {
         return await apiFetch<MeResponse>("/auth/me")
       } catch (e) {
-        if (e instanceof Error && e.name === "ApiError" && (e as { status?: number }).status === 401) {
+        if (
+          e instanceof Error &&
+          e.name === "ApiError" &&
+          (e as { status?: number }).status === 401
+        ) {
           return null
         }
         throw e
@@ -3055,7 +3140,9 @@ const SocketContext = createContext<Socket | null>(null)
 
 export function SocketProvider({ children }: { children: ReactNode }) {
   // Filled in Task 9.
-  return <SocketContext.Provider value={null}>{children}</SocketContext.Provider>
+  return (
+    <SocketContext.Provider value={null}>{children}</SocketContext.Provider>
+  )
 }
 
 export function useSocket() {
@@ -3071,8 +3158,23 @@ import { Outlet } from "react-router-dom"
 
 export function AuthLayout() {
   return (
-    <Layout style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
-      <div style={{ width: 360, padding: 32, background: "#fff", borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
+    <Layout
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <div
+        style={{
+          width: 360,
+          padding: 32,
+          background: "#fff",
+          borderRadius: 8,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+        }}
+      >
         <h1 style={{ marginTop: 0, marginBottom: 24 }}>Kudos</h1>
         <Outlet />
       </div>
@@ -3299,12 +3401,14 @@ git commit -m "feat(web): add vite + react shell with routing, providers, and fe
 ## Task 8: Auth frontend (`LoginPage`, `RegisterPage`, `useAuth`)
 
 **Files:**
+
 - Modify: `apps/web/src/features/auth/LoginPage.tsx` (replace stub)
 - Modify: `apps/web/src/features/auth/RegisterPage.tsx` (replace stub)
 - Create: `apps/web/src/features/auth/useAuth.ts`
 - Create: `apps/web/src/features/auth/auth.api.ts`
 
 **Interfaces:**
+
 - Consumes: `apiFetch`, `queryKeys`, shared auth schemas.
 - Produces:
   - `useLogin()` — mutation calling `POST /auth/login`, invalidates `queryKeys.me`.
@@ -3389,10 +3493,12 @@ export function LoginPage() {
         if (e.code === "INVALID_CREDENTIALS") {
           setErrorMsg("Invalid email or password.")
         } else if (e.code === "VALIDATION_FAILED" && e.fields) {
-          const fieldErrors = Object.entries(e.fields).map(([name, errors]) => ({
-            name,
-            errors: [errors],
-          }))
+          const fieldErrors = Object.entries(e.fields).map(
+            ([name, errors]) => ({
+              name,
+              errors: [errors],
+            }),
+          )
           form.setFields(fieldErrors)
         } else {
           setErrorMsg(e.message)
@@ -3414,7 +3520,12 @@ export function LoginPage() {
           style={{ marginBottom: 16 }}
         />
       )}
-      <Form form={form} layout="vertical" onFinish={onFinish} disabled={login.isPending}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        disabled={login.isPending}
+      >
         <Form.Item
           name="email"
           label="Email"
@@ -3473,10 +3584,15 @@ export function RegisterPage() {
     } catch (e) {
       if (e instanceof ApiError) {
         if (e.code === "EMAIL_TAKEN") {
-          form.setFields([{ name: "email", errors: ["That email is already registered."] }])
+          form.setFields([
+            { name: "email", errors: ["That email is already registered."] },
+          ])
         } else if (e.code === "VALIDATION_FAILED" && e.fields) {
           form.setFields(
-            Object.entries(e.fields).map(([name, err]) => ({ name, errors: [err] })),
+            Object.entries(e.fields).map(([name, err]) => ({
+              name,
+              errors: [err],
+            })),
           )
         } else {
           setErrorMsg(e.message)
@@ -3491,9 +3607,19 @@ export function RegisterPage() {
     <>
       <h2 style={{ marginTop: 0 }}>Create account</h2>
       {errorMsg && (
-        <Alert type="error" message={errorMsg} showIcon style={{ marginBottom: 16 }} />
+        <Alert
+          type="error"
+          message={errorMsg}
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
       )}
-      <Form form={form} layout="vertical" onFinish={onFinish} disabled={register.isPending}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        disabled={register.isPending}
+      >
         <Form.Item
           name="email"
           label="Email"
@@ -3511,7 +3637,9 @@ export function RegisterPage() {
         <Form.Item
           name="password"
           label="Password"
-          rules={[{ required: true, min: 10, message: "At least 10 characters" }]}
+          rules={[
+            { required: true, min: 10, message: "At least 10 characters" },
+          ]}
         >
           <Input.Password autoComplete="new-password" />
         </Form.Item>
@@ -3577,6 +3705,7 @@ git commit -m "feat(auth): add login and register pages with error mapping"
 ## Task 9: Socket.io skeleton (backend + frontend, `ping` round-trip)
 
 **Files:**
+
 - Create: `apps/api/src/realtime/{socket-server.ts, socket-auth.ts, rooms.ts, ping.handler.ts}`
 - Modify: `apps/api/src/main.ts` — attach Socket.io to HTTP server
 - Modify: `apps/web/src/app/providers/SocketProvider.tsx` — real implementation
@@ -3584,6 +3713,7 @@ git commit -m "feat(auth): add login and register pages with error mapping"
 - Modify: `apps/web/src/app/routes.tsx` — add temporary "Ping" button on `/` for verification
 
 **Interfaces:**
+
 - Consumes: express session store (Redis), `SocketEvents` from `@kudos/shared`.
 - Produces:
   - Backend Socket.io namespace on default `/`, authenticates via session cookie, joins `user:${userId}` and `feed` rooms on connect.
@@ -3693,7 +3823,10 @@ export function attachSocketServer(httpServer: HttpServer): Server {
 
     logger.info({ userId, socketId: socket.id }, "socket connected")
     socket.on("disconnect", (reason) => {
-      logger.info({ userId, socketId: socket.id, reason }, "socket disconnected")
+      logger.info(
+        { userId, socketId: socket.id, reason },
+        "socket disconnected",
+      )
     })
   })
 
@@ -3738,7 +3871,13 @@ process.on("SIGINT", () => shutdown("SIGINT"))
 - [ ] **Step 6: Overwrite `apps/web/src/app/providers/SocketProvider.tsx`**
 
 ```tsx
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react"
 import { io, type Socket } from "socket.io-client"
 
 import { useCurrentUser } from "../../common/hooks/useCurrentUser"
@@ -3768,7 +3907,9 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [me?.id])
 
-  return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
+  return (
+    <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
+  )
 }
 
 export function useSocket() {
@@ -3804,7 +3945,9 @@ function HomePlaceholder() {
     const onEstablished = (payload: { userId: string }) =>
       setStatus(`connected as ${payload.userId}`)
     const onPong = (payload: { clientTs: number; serverTs: number }) =>
-      setLastPong(`Round trip: ${Date.now() - payload.clientTs}ms (server ${payload.serverTs})`)
+      setLastPong(
+        `Round trip: ${Date.now() - payload.clientTs}ms (server ${payload.serverTs})`,
+      )
 
     socket.on("connect", onConnect)
     socket.on("disconnect", onDisconnect)
@@ -3823,7 +3966,9 @@ function HomePlaceholder() {
   return (
     <Space direction="vertical" size="middle">
       <Typography.Title level={3}>Welcome</Typography.Title>
-      <div>Socket status: <b>{status}</b></div>
+      <div>
+        Socket status: <b>{status}</b>
+      </div>
       <Button
         type="primary"
         disabled={!socket}
@@ -3832,7 +3977,9 @@ function HomePlaceholder() {
         Ping server
       </Button>
       {lastPong && <div>{lastPong}</div>}
-      <Typography.Text type="secondary">Feed lands in Sprint 2.</Typography.Text>
+      <Typography.Text type="secondary">
+        Feed lands in Sprint 2.
+      </Typography.Text>
     </Space>
   )
 }
@@ -3870,6 +4017,7 @@ pnpm --filter @kudos/web dev
 Open http://localhost:5173, log in as `admin@test.local` / `adminpass123`.
 
 Expected on `/`:
+
 - "Socket status: **connected as <uuid>**"
 - Click "Ping server" → "Round trip: 3ms (server ...)"
 - API log shows: `socket connected` with userId + socketId.
@@ -3888,10 +4036,12 @@ git commit -m "feat(realtime): add socket.io skeleton with session-cookie auth a
 ## Task 10: CI workflow + `apps/worker` empty stub + finalize
 
 **Files:**
+
 - Create: `.github/workflows/ci.yml`
 - Create: `apps/worker/{package.json, tsconfig.json, src/main.ts}`
 
 **Interfaces:**
+
 - Consumes: everything above.
 - Produces: pushes trigger GH Actions running lint, typecheck, unit test, integration test, build. Failing build blocks merge.
 
@@ -3948,7 +4098,9 @@ And `apps/worker/tsconfig.build.json`:
 ```ts
 import { env } from "@kudos/config"
 
-console.warn(`Worker stub — NODE_ENV=${env.NODE_ENV}. Real jobs land in Sprint 1.`)
+console.warn(
+  `Worker stub — NODE_ENV=${env.NODE_ENV}. Real jobs land in Sprint 1.`,
+)
 ```
 
 - [ ] **Step 4: Install**
@@ -4071,6 +4223,7 @@ pnpm --filter @kudos/web dev &
 ```
 
 Verify:
+
 - http://localhost:4000/health returns `{"data":{"status":"ok","db":"ok","redis":"ok"}}`
 - http://localhost:5173 login works as `admin@test.local` / `adminpass123`
 - Header shows `Hi, Admin Adminson · 200 to give · 0 earned`
