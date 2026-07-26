@@ -1,12 +1,12 @@
 import { ErrorCode, type MeResponse } from "@kudos/shared"
 import bcrypt from "bcrypt"
 
-
 import {
   AppError,
   ConflictError,
   UnauthenticatedError,
 } from "../../common/errors"
+import type { Prisma } from "../../common/prisma-client"
 import { db } from "../../common/prisma-client"
 
 import {
@@ -25,7 +25,7 @@ export const authService = {
       throw new ConflictError(ErrorCode.EMAIL_TAKEN, "Email already registered")
     }
     const passwordHash = await bcrypt.hash(input.password, BCRYPT_COST)
-    const user = await db.$transaction((tx) =>
+    const user = await db.$transaction((tx: Prisma.TransactionClient) =>
       createUserWithPassword(input.email, input.displayName, passwordHash, tx),
     )
     return toMeResponse(user)

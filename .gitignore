@@ -16,3 +16,4 @@ packages/*/.turbo/
 packages/db/prisma/migrations/dev.db*
 .pnpm-store/
 .superpowers/
+.playwright-mcp/
