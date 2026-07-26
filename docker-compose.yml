@@ -17,6 +17,24 @@ services:
       timeout: 3s
       retries: 20
 
+  postgres-test:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test
+      TZ: UTC
+    ports:
+      - "5433:5432"
+    volumes:
+      - kudos_pg_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "test", "-d", "test"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
   redis:
     image: redis:7-alpine
     restart: unless-stopped
@@ -64,5 +82,6 @@ services:
 
 volumes:
   kudos_pg_data:
+  kudos_pg_test_data:
   kudos_redis_data:
   kudos_minio_data:

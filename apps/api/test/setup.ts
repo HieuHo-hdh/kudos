@@ -41,6 +41,9 @@ beforeAll(async () => {
 }, 120_000)
 
 beforeEach(async () => {
+  if (!process.env.DATABASE_URL) {
+    return // Skip if DATABASE_URL not set yet (shouldn't happen but safety check)
+  }
   const { db } = await import("../src/common/prisma-client")
   const tables = [
     "comment_media",
