@@ -4,9 +4,11 @@ import { env } from "@kudos/config"
 
 import { createApp } from "./app"
 import { logger } from "./common/logger"
+import { attachSocketServer } from "./realtime/socket-server"
 
 const app = createApp()
 const httpServer = createServer(app)
+attachSocketServer(httpServer)
 
 httpServer.listen(env.PORT, () => {
   logger.info(`API listening on http://localhost:${env.PORT}`)
