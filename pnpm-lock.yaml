@@ -33,8 +33,8 @@ importers:
         specifier: ^7.37.0
         version: 7.37.5(eslint@9.39.5(jiti@2.6.1))
       eslint-plugin-react-hooks:
-        specifier: ^4.6.2
-        version: 4.6.2(eslint@9.39.5(jiti@2.6.1))
+        specifier: ^5.2.0
+        version: 5.2.0(eslint@9.39.5(jiti@2.6.1))
       globals:
         specifier: ^15.9.0
         version: 15.15.0
@@ -120,6 +120,9 @@ importers:
       '@types/bcrypt':
         specifier: ^5.0.2
         version: 5.0.2
+      '@types/cookie':
+        specifier: ^0.6.0
+        version: 0.6.0
       '@types/cookie-parser':
         specifier: ^1.4.7
         version: 1.4.10(@types/express@4.17.25)
@@ -1329,6 +1332,9 @@ packages:
     peerDependencies:
       '@types/express': '*'
 
+  '@types/cookie@0.6.0':
+    resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
+
   '@types/cookiejar@2.1.5':
     resolution: {integrity: sha512-he+DHOWReW0nghN24E1WUqM0efK4kI9oTqDm6XmK8ZPe2djZ90BSNdGnIyCLzCPw7/pogPlGbzI2wHGGmi4O/Q==}
 
@@ -2313,11 +2319,11 @@ packages:
       '@typescript-eslint/parser':
         optional: true
 
-  eslint-plugin-react-hooks@4.6.2:
-    resolution: {integrity: sha512-QzliNJq4GinDBcD8gPB5v0wh6g8q3SUi6EFF0x8N/BL9PoVs0atuGc47ozMRyOWAKdwaZ5OnbOEa3WR+dSGKuQ==}
+  eslint-plugin-react-hooks@5.2.0:
+    resolution: {integrity: sha512-+f15FfK64YQwZdJNELETdn5ibXEUQmW1DZL6KXhNnc2heoy/sg9VJJeT7n8TlMWouzWqSWavFkIhHyIbIAEapg==}
     engines: {node: '>=10'}
     peerDependencies:
-      eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
+      eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
 
   eslint-plugin-react@7.37.5:
     resolution: {integrity: sha512-Qteup0SqU15kdocexFNAJMvCJEfa2xUKNV4CC1xsVMrIIqEy3SQ/rqyxCWNzfrd3/ldy6HMlD2e0JDVpDg2qIA==}
@@ -5496,6 +5502,8 @@ snapshots:
     dependencies:
       '@types/express': 4.17.25
 
+  '@types/cookie@0.6.0': {}
+
   '@types/cookiejar@2.1.5': {}
 
   '@types/cors@2.8.19':
@@ -6755,7 +6763,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-react-hooks@4.6.2(eslint@9.39.5(jiti@2.6.1)):
+  eslint-plugin-react-hooks@5.2.0(eslint@9.39.5(jiti@2.6.1)):
     dependencies:
       eslint: 9.39.5(jiti@2.6.1)
 
