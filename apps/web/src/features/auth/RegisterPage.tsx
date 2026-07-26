@@ -43,16 +43,11 @@ export function RegisterPage() {
 
   return (
     <>
-      <Typography.Title level={3} style={{ marginTop: 0 }}>
+      <Typography.Title level={4} className="!mt-0">
         Create account
       </Typography.Title>
       {errorMsg && (
-        <Alert
-          type="error"
-          message={errorMsg}
-          showIcon
-          style={{ marginBottom: 16 }}
-        />
+        <Alert type="error" message={errorMsg} showIcon className="!mb-4" />
       )}
       <Form
         form={form}
@@ -65,14 +60,14 @@ export function RegisterPage() {
           label="Email"
           rules={[{ required: true, type: "email" }]}
         >
-          <Input autoComplete="email" autoFocus size="large" />
+          <Input autoComplete="email" autoFocus />
         </Form.Item>
         <Form.Item
           name="displayName"
           label="Display name"
           rules={[{ required: true, max: 80 }]}
         >
-          <Input autoComplete="name" size="large" />
+          <Input autoComplete="name" />
         </Form.Item>
         <Form.Item
           name="password"
@@ -81,19 +76,18 @@ export function RegisterPage() {
             { required: true, min: 10, message: "At least 10 characters" },
           ]}
         >
-          <Input.Password autoComplete="new-password" size="large" />
+          <Input.Password autoComplete="new-password" />
         </Form.Item>
         <Button
           type="primary"
           htmlType="submit"
           block
-          size="large"
           loading={register.isPending}
         >
           Create account
         </Button>
       </Form>
-      <div style={{ marginTop: 16, textAlign: "center" }}>
+      <div className="mt-4 text-center">
         Have an account? <Link to="/login">Sign in</Link>
       </div>
     </>

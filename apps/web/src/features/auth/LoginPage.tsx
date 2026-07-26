@@ -41,16 +41,11 @@ export function LoginPage() {
 
   return (
     <>
-      <Typography.Title level={3} style={{ marginTop: 0 }}>
+      <Typography.Title level={4} className="!mt-0">
         Sign in
       </Typography.Title>
       {errorMsg && (
-        <Alert
-          type="error"
-          message={errorMsg}
-          showIcon
-          style={{ marginBottom: 16 }}
-        />
+        <Alert type="error" message={errorMsg} showIcon className="!mb-4" />
       )}
       <Form
         form={form}
@@ -63,26 +58,25 @@ export function LoginPage() {
           label="Email"
           rules={[{ required: true, type: "email" }]}
         >
-          <Input autoComplete="email" autoFocus size="large" />
+          <Input autoComplete="email" autoFocus />
         </Form.Item>
         <Form.Item
           name="password"
           label="Password"
           rules={[{ required: true, min: 1 }]}
         >
-          <Input.Password autoComplete="current-password" size="large" />
+          <Input.Password autoComplete="current-password" />
         </Form.Item>
         <Button
           type="primary"
           htmlType="submit"
           block
-          size="large"
           loading={login.isPending}
         >
           Sign in
         </Button>
       </Form>
-      <div style={{ marginTop: 16, textAlign: "center" }}>
+      <div className="mt-4 text-center">
         No account? <Link to="/register">Create one</Link>
       </div>
     </>

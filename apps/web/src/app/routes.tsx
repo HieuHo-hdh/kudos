@@ -4,8 +4,12 @@ import { Navigate, Route, Routes } from "react-router-dom"
 
 import { useCurrentUser } from "../common/hooks/useCurrentUser"
 import { useSocket } from "../common/hooks/useSocket"
+import { ManageUsersPage } from "../features/admin/ManageUsersPage"
 import { LoginPage } from "../features/auth/LoginPage"
 import { RegisterPage } from "../features/auth/RegisterPage"
+import { FeedPage } from "../features/feed/FeedPage"
+import { GiveKudosPage } from "../features/kudos/GiveKudosPage"
+import { RewardsPage } from "../features/rewards/RewardsPage"
 
 import { AppShell } from "./layout/AppShell"
 import { AuthLayout } from "./layout/AuthLayout"
@@ -21,6 +25,13 @@ function AlreadyAuthed({ children }: { children: ReactNode }) {
   const { data, isLoading } = useCurrentUser()
   if (isLoading) return <Spin fullscreen />
   if (data) return <Navigate to="/" replace />
+  return <>{children}</>
+}
+
+function AdminOnly({ children }: { children: ReactNode }) {
+  const { data, isLoading } = useCurrentUser()
+  if (isLoading) return <Spin fullscreen />
+  if (data?.role !== "ADMIN") return <Navigate to="/" replace />
   return <>{children}</>
 }
 
@@ -97,6 +108,17 @@ export function AppRoutes() {
         }
       >
         <Route path="/" element={<HomePlaceholder />} />
+        <Route path="/feed" element={<FeedPage />} />
+        <Route path="/give" element={<GiveKudosPage />} />
+        <Route path="/rewards" element={<RewardsPage />} />
+        <Route
+          path="/admin/users"
+          element={
+            <AdminOnly>
+              <ManageUsersPage />
+            </AdminOnly>
+          }
+        />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

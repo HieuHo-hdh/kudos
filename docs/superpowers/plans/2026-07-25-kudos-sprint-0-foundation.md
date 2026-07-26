@@ -3685,7 +3685,7 @@ pnpm --filter @kudos/web dev
 Open http://localhost:5173:
 
 1. Redirects to `/login`.
-2. Log in as `admin@test.local` / `adminpass123` → lands on `/`, header shows "Hi, Admin Adminson · 200 to give · 0 earned".
+2. Log in as `admin@test.local` / `adminpass123` → lands on `/`, header shows "Hi, Admin Adminson ".
 3. Click "Log out" → redirects to `/login`, no user shown.
 4. Go to `/register`, register `new@test.local` / `newuser` / `password12345` → lands on `/`, header shows the new user.
 5. Try registering the same email again → email field shows "That email is already registered."
@@ -3965,7 +3965,7 @@ function HomePlaceholder() {
 
   return (
     <Space direction="vertical" size="middle">
-      <Typography.Title level={3}>Welcome</Typography.Title>
+      <Typography.Title level={4}>Welcome</Typography.Title>
       <div>
         Socket status: <b>{status}</b>
       </div>
@@ -4226,7 +4226,7 @@ Verify:
 
 - http://localhost:4000/health returns `{"data":{"status":"ok","db":"ok","redis":"ok"}}`
 - http://localhost:5173 login works as `admin@test.local` / `adminpass123`
-- Header shows `Hi, Admin Adminson · 200 to give · 0 earned`
+- Header shows `Hi, Admin Adminson `
 - "Ping server" button returns a pong
 
 Kill background dev servers:
@@ -4251,6 +4251,94 @@ git push -u origin main
 ```
 
 Watch the Actions tab for green. If any step fails, fix locally and push again.
+
+---
+
+## Task 11: Header navigation menu + user dropdown (responsive)
+
+**Files:**
+
+- Create: `apps/web/src/features/feed/FeedPage.tsx`
+- Create: `apps/web/src/features/kudos/GiveKudosPage.tsx`
+- Create: `apps/web/src/features/rewards/RewardsPage.tsx`
+- Create: `apps/web/src/features/admin/ManageUsersPage.tsx`
+- Modify: `apps/web/src/app/layout/AppShell.tsx`
+- Modify: `apps/web/src/app/routes.tsx`
+
+**Interfaces:**
+
+- Consumes: `useCurrentUser` (role, displayName, budgets), Tailwind, antd `Menu` / `Dropdown` / `Drawer` / `Grid.useBreakpoint`.
+- Produces: shared nav shell reused by every authenticated feature added in later sprints.
+
+**Design:**
+
+- Header left → `Kudos` logo + horizontal `Menu` at `md`+.
+  - Items: `Home`, `Feed`, `Give Kudos`, `Rewards`, `Manage Users` (admin only).
+- Header right → user `Dropdown` triggered by avatar + display name.
+  - Dropdown panel: `Hi, {displayName}` greeting, `{givingBudgetRemaining} to give · {earnedBalance} earned`, `Log out` action.
+- Below `md` → replace the horizontal menu with a hamburger `Button` that opens a `Drawer` containing the same items.
+- Not-yet-implemented pages render a single `Typography.Title` with the page name (placeholder for later sprints).
+
+- [ ] **Step 1: Create page stubs**
+
+Each file:
+
+```tsx
+// apps/web/src/features/feed/FeedPage.tsx
+import { Typography } from "antd"
+
+export function FeedPage() {
+  return <Typography.Title level={3}>Feed</Typography.Title>
+}
+```
+
+Repeat for `GiveKudosPage` ("Give Kudos"), `RewardsPage` ("Rewards"), `ManageUsersPage` ("Manage Users").
+
+- [ ] **Step 2: Rebuild `AppShell.tsx`**
+
+Responsibilities:
+
+- Compute nav items from a single array, filtering `adminOnly` items when `me.role !== "ADMIN"`.
+- Use `Grid.useBreakpoint()`; render horizontal `Menu` when `screens.md`, else render a hamburger `Button` + `Drawer`.
+- Highlight active item via `useLocation()` → `selectedKeys`.
+- Right side always renders the user `Dropdown` (avatar + display name).
+
+- [ ] **Step 3: Guard admin routes**
+
+Add a small `AdminOnly` wrapper in `routes.tsx` that redirects to `/` when the current user is not an admin.
+
+- [ ] **Step 4: Wire routes under `AppShell`**
+
+```tsx
+<Route path="/" element={<HomePlaceholder />} />
+<Route path="/feed" element={<FeedPage />} />
+<Route path="/give" element={<GiveKudosPage />} />
+<Route path="/rewards" element={<RewardsPage />} />
+<Route
+  path="/admin/users"
+  element={
+    <AdminOnly>
+      <ManageUsersPage />
+    </AdminOnly>
+  }
+/>
+```
+
+- [ ] **Step 5: Typecheck**
+
+```bash
+pnpm --filter @kudos/web exec tsc --noEmit
+```
+
+- [ ] **Step 6: Verify responsive**
+
+Widths 360 / 768 / 1440: menu present at ≥ md, hamburger + drawer below, user dropdown always right-aligned, admin item hidden for non-admin sessions.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git commit -m "feat(web): add responsive header nav and user dropdown"
+```
 
 ---
 

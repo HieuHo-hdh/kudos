@@ -13,6 +13,26 @@
   `App.useApp()` instead of the static imports so context (theme,
   ConfigProvider) is respected.
 
+## Styling
+
+- **Tailwind CSS v4** is the default styling primitive. Use utility
+  `className`s for layout, spacing, sizing, positioning, colors, and
+  typography. The Tailwind entry lives at `src/styles/tailwind.css` and
+  is imported once from `main.tsx`.
+- **Avoid inline `style={{ ... }}`.** Use it only when a value is
+  dynamic (e.g., computed from state/props) and cannot be expressed as a
+  static class or a Tailwind arbitrary value like `w-[360px]`.
+- **Antd tokens carry component visuals** (brand color, radius, control
+  heights, motion). Tune the shared theme in `src/styles/theme.ts` and
+  the `ConfigProvider` at the app root — do not restyle antd components
+  case-by-case.
+- **Overriding antd internals** (e.g., `Header` background, `Typography.Title`
+  margin) requires Tailwind's `!` important prefix because antd's
+  `:where()`-scoped CSS has specificity 0. Example: `className="!bg-white !m-0"`.
+- Prefer semantic Tailwind spacing (`p-6`, `mt-4`) over pixel arbitrary
+  values. Reach for arbitrary values only when the design truly needs an
+  off-scale number.
+
 ## Responsive
 
 - Every screen and component must work from **mobile (≥360px) up to
