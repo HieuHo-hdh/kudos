@@ -7,6 +7,7 @@ import session from "express-session"
 import helmet from "helmet"
 
 import { redis } from "./common/redis-client"
+import { adminRouter } from "./features/admin/admin.routes"
 import { authRouter } from "./features/auth/auth.routes"
 import { healthRouter } from "./features/health/health.routes"
 import { usersRouter } from "./features/users/users.routes"
@@ -51,6 +52,7 @@ export function createApp(): Express {
   app.use("/health", healthRouter)
   app.use("/auth", authRouter)
   app.use("/users", usersRouter)
+  app.use("/admin", adminRouter)
 
   app.use(errorHandler())
   return app

@@ -13,6 +13,7 @@ const EnvSchema = z.object({
     .default("development"),
   PORT: z.coerce.number().int().positive().default(4000),
   WEB_ORIGIN: z.string().url(),
+  API_ORIGIN: z.string().url(),
   DATABASE_URL: z.string().url(),
   REDIS_URL: z.string().url(),
   SESSION_SECRET: z.string().min(32),
@@ -28,7 +29,6 @@ const EnvSchema = z.object({
 })
 
 export type Env = z.infer<typeof EnvSchema>
-
 const parsed = EnvSchema.safeParse(process.env)
 
 if (!parsed.success) {
