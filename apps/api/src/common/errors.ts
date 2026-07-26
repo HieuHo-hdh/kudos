@@ -19,14 +19,26 @@ export class UnauthenticatedError extends AppError {
 }
 
 export class ForbiddenError extends AppError {
-  constructor(message = "You do not have permission to do that") {
-    super(ErrorCode.FORBIDDEN, 403, message)
+  constructor(codeOrMessage?: ErrorCodeType | string, message?: string) {
+    if (typeof codeOrMessage === "string" && !message) {
+      super(ErrorCode.FORBIDDEN, 403, codeOrMessage)
+    } else if (typeof codeOrMessage !== "string") {
+      super(codeOrMessage || ErrorCode.FORBIDDEN, 403, message || "Forbidden")
+    } else {
+      super(codeOrMessage as ErrorCodeType, 403, message || "Forbidden")
+    }
   }
 }
 
 export class NotFoundError extends AppError {
-  constructor(message = "Not found") {
-    super(ErrorCode.NOT_FOUND, 404, message)
+  constructor(codeOrMessage?: ErrorCodeType | string, message?: string) {
+    if (typeof codeOrMessage === "string" && !message) {
+      super(ErrorCode.NOT_FOUND, 404, codeOrMessage)
+    } else if (typeof codeOrMessage !== "string") {
+      super(codeOrMessage || ErrorCode.NOT_FOUND, 404, message || "Not found")
+    } else {
+      super(codeOrMessage as ErrorCodeType, 404, message || "Not found")
+    }
   }
 }
 

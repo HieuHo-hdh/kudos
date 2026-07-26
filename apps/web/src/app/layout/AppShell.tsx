@@ -1,4 +1,12 @@
-import { LogoutOutlined, MenuOutlined, UserOutlined } from "@ant-design/icons"
+import {
+  GiftOutlined,
+  HomeOutlined,
+  IdcardOutlined,
+  LogoutOutlined,
+  MenuOutlined,
+  ShoppingOutlined,
+  UserOutlined,
+} from "@ant-design/icons"
 import {
   Avatar,
   Button,
@@ -8,24 +16,33 @@ import {
   Layout,
   Menu,
   type MenuProps,
-  Typography,
 } from "antd"
 import { useState } from "react"
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
+import { useNavigate, Outlet, useLocation } from "react-router-dom"
 
 import { apiFetch } from "../../common/api/client"
 import { useCurrentUser } from "../../common/hooks/useCurrentUser"
 
-const { Header, Content } = Layout
+const { Sider, Header, Content } = Layout
 
-type NavItem = { key: string; label: string; adminOnly?: boolean }
+type NavItem = {
+  key: string
+  label: string
+  icon: React.ReactNode
+  adminOnly?: boolean
+}
 
 const NAV_ITEMS: NavItem[] = [
-  { key: "/", label: "Home" },
-  { key: "/feed", label: "Feed" },
-  { key: "/give", label: "Give Kudos" },
-  { key: "/rewards", label: "Rewards" },
-  { key: "/admin/users", label: "Manage Users", adminOnly: true },
+  { key: "/", label: "Home", icon: <HomeOutlined /> },
+  { key: "/feed", label: "Feed", icon: <IdcardOutlined /> },
+  { key: "/give", label: "Give Kudos", icon: <GiftOutlined /> },
+  { key: "/rewards", label: "Rewards", icon: <ShoppingOutlined /> },
+  {
+    key: "/admin/users",
+    label: "Manage Users",
+    icon: <UserOutlined />,
+    adminOnly: true,
+  },
 ]
 
 export function AppShell() {
@@ -39,7 +56,9 @@ export function AppShell() {
   const items = NAV_ITEMS.filter((i) => !i.adminOnly || isAdmin)
   const menuItems: MenuProps["items"] = items.map((i) => ({
     key: i.key,
-    label: <Link to={i.key}>{i.label}</Link>,
+    icon: i.icon,
+    label: i.label,
+    onClick: () => navigate(i.key),
   }))
 
   const handleLogout = async () => {
@@ -76,8 +95,8 @@ export function AppShell() {
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Header className="!bg-white !px-4 md:!px-6 flex justify-between items-center gap-4 border-b border-gray-200">
-        <div className="flex items-center gap-4 min-w-0 flex-1">
+      <Header className="!bg-white !px-6 flex justify-between items-center border-b border-gray-200 gap-4">
+        <div className="flex items-center gap-2">
           {!screens.md && (
             <Button
               type="text"
@@ -86,19 +105,12 @@ export function AppShell() {
               aria-label="Open menu"
             />
           )}
-          <Link to="/" className="text-inherit no-underline shrink-0">
-            <Typography.Title level={4} className="!m-0">
-              Kudos
-            </Typography.Title>
-          </Link>
-          {screens.md && (
-            <Menu
-              mode="horizontal"
-              selectedKeys={[location.pathname]}
-              items={menuItems}
-              className="!border-b-0 !bg-transparent min-w-0 flex-1 flex items-center justify-center"
-            />
-          )}
+          <div
+            className="text-lg font-bold cursor-pointer"
+            onClick={() => navigate("/")}
+          >
+            Kudos
+          </div>
         </div>
         {me && (
           <Dropdown
@@ -120,6 +132,7 @@ export function AppShell() {
           </Dropdown>
         )}
       </Header>
+
       <Drawer
         placement="left"
         open={drawerOpen}
@@ -133,12 +146,29 @@ export function AppShell() {
           selectedKeys={[location.pathname]}
           items={menuItems}
           onClick={() => setDrawerOpen(false)}
-          className="!border-r-0"
+          style={{ border: "none" }}
         />
       </Drawer>
-      <Content className="p-6">
-        <Outlet />
-      </Content>
+
+      <Layout>
+        {screens.md && (
+          <Sider
+            style={{ background: "#ffffff" }}
+            className="border-r border-gray-200"
+          >
+            <Menu
+              mode="inline"
+              selectedKeys={[location.pathname]}
+              items={menuItems}
+              style={{ border: "none" }}
+            />
+          </Sider>
+        )}
+
+        <Content className="p-6 bg-gray-50">
+          <Outlet />
+        </Content>
+      </Layout>
     </Layout>
   )
 }
