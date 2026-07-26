@@ -1,5 +1,11 @@
-import "dotenv/config"
+import { dirname, resolve } from "node:path"
+import { fileURLToPath } from "node:url"
+
+import { config as loadDotenv } from "dotenv"
 import { z } from "zod"
+
+const here = dirname(fileURLToPath(import.meta.url))
+loadDotenv({ path: resolve(here, "../../..", ".env") })
 
 const EnvSchema = z.object({
   NODE_ENV: z
