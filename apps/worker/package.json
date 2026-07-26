@@ -1,0 +1,23 @@
+{
+  "name": "@kudos/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@kudos/config": "workspace:*",
+    "@kudos/db": "workspace:*",
+    "@kudos/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "tsx": "^4.19.1",
+    "typescript": "^5.5.4"
+  }
+}

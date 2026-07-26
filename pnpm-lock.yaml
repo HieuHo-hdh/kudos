@@ -230,6 +230,28 @@ importers:
         specifier: ^2.1.1
         version: 2.1.9(@types/node@26.1.1)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.15.0(@types/node@26.1.1)(typescript@5.9.3))
 
+  apps/worker:
+    dependencies:
+      '@kudos/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@kudos/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@kudos/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+    devDependencies:
+      '@types/node':
+        specifier: ^22.7.4
+        version: 22.20.1
+      tsx:
+        specifier: ^4.19.1
+        version: 4.23.1
+      typescript:
+        specifier: ^5.5.4
+        version: 5.9.3
+
   packages/config:
     dependencies:
       dotenv:
