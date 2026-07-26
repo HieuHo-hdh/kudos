@@ -15,7 +15,8 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const { body, headers, signal, ...rest } = opts
   const isForm = body instanceof FormData
-  const res = await fetch(path, {
+  const url = new URL(path, import.meta.env.VITE_API_URL).toString()
+  const res = await fetch(url, {
     credentials: "include",
     signal: signal ?? AbortSignal.timeout(30_000),
     headers: {
