@@ -1,7 +1,6 @@
 import { ErrorCode, type MeResponse } from "@kudos/shared"
 import bcrypt from "bcrypt"
 
-
 import {
   AppError,
   ConflictError,
