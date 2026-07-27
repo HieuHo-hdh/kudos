@@ -17,15 +17,6 @@ const EnvSchema = z.object({
   DATABASE_URL: z.string().url(),
   REDIS_URL: z.string().url(),
   SESSION_SECRET: z.string().min(32),
-  S3_ENDPOINT: z.string().url(),
-  S3_REGION: z.string().min(1),
-  S3_BUCKET: z.string().min(1),
-  S3_ACCESS_KEY: z.string().min(1),
-  S3_SECRET_KEY: z.string().min(1),
-  S3_FORCE_PATH_STYLE: z
-    .enum(["true", "false"])
-    .default("true")
-    .transform((v) => v === "true"),
 })
 
 export type Env = z.infer<typeof EnvSchema>

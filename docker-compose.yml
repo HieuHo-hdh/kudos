@@ -49,39 +49,22 @@ services:
       timeout: 3s
       retries: 20
 
-  minio:
-    image: minio/minio:latest
+  redis-test:
+    image: redis:7-alpine
     restart: unless-stopped
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+    command: ["redis-server", "--appendonly", "yes"]
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "6380:6379"
     volumes:
-      - kudos_minio_data:/data
+      - kudos_redis_test_data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 20
-
-  minio-createbucket:
-    image: minio/mc:latest
-    depends_on:
-      minio:
-        condition: service_healthy
-    entrypoint: >
-      /bin/sh -c "
-      mc alias set local http://minio:9000 minioadmin minioadmin;
-      mc mb --ignore-existing local/kudos-media;
-      mc anonymous set download local/kudos-media;
-      exit 0;
-      "
 
 volumes:
   kudos_pg_data:
   kudos_pg_test_data:
   kudos_redis_data:
-  kudos_minio_data:
+  kudos_redis_test_data:
