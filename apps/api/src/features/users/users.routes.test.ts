@@ -1,15 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 
-import * as adminService from "./admin.service"
+import * as usersService from "./users.service"
 
-vi.mock("./admin.service")
+vi.mock("./users.service")
 
-describe("Admin Routes", () => {
+describe("Users Routes", () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  describe("GET /admin/users", () => {
+  describe("GET /users", () => {
     it("should list users with pagination and filters", async () => {
       const mockUsers = [
         {
@@ -27,7 +27,7 @@ describe("Admin Routes", () => {
         },
       ]
 
-      vi.mocked(adminService.adminService.listUsers).mockResolvedValue({
+      vi.mocked(usersService.usersService.listUsers).mockResolvedValue({
         items: mockUsers,
         total: 1,
         page: 1,
@@ -35,7 +35,7 @@ describe("Admin Routes", () => {
         hasMore: false,
       })
 
-      const result = await adminService.adminService.listUsers({
+      const result = await usersService.usersService.listUsers({
         page: 1,
         limit: 20,
       })
@@ -46,7 +46,7 @@ describe("Admin Routes", () => {
     })
 
     it("should filter users by role", async () => {
-      vi.mocked(adminService.adminService.listUsers).mockResolvedValue({
+      vi.mocked(usersService.usersService.listUsers).mockResolvedValue({
         items: [],
         total: 0,
         page: 1,
@@ -54,19 +54,19 @@ describe("Admin Routes", () => {
         hasMore: false,
       })
 
-      await adminService.adminService.listUsers({
+      await usersService.usersService.listUsers({
         page: 1,
         limit: 20,
         role: "ADMIN",
       })
 
-      expect(adminService.adminService.listUsers).toHaveBeenCalledWith(
+      expect(usersService.usersService.listUsers).toHaveBeenCalledWith(
         expect.objectContaining({ role: "ADMIN" }),
       )
     })
 
     it("should search users by email or name", async () => {
-      vi.mocked(adminService.adminService.listUsers).mockResolvedValue({
+      vi.mocked(usersService.usersService.listUsers).mockResolvedValue({
         items: [],
         total: 0,
         page: 1,
@@ -74,19 +74,46 @@ describe("Admin Routes", () => {
         hasMore: false,
       })
 
-      await adminService.adminService.listUsers({
+      await usersService.usersService.listUsers({
         page: 1,
         limit: 20,
         search: "test",
       })
 
-      expect(adminService.adminService.listUsers).toHaveBeenCalledWith(
+      expect(usersService.usersService.listUsers).toHaveBeenCalledWith(
         expect.objectContaining({ search: "test" }),
       )
     })
   })
 
-  describe("PUT /admin/users/:id", () => {
+  describe("GET /users/:id", () => {
+    it("should get user detail", async () => {
+      const mockUser = {
+        id: "1",
+        email: "user@test.local",
+        displayName: "User",
+        role: "EMPLOYEE" as const,
+        avatarUrl: null,
+        timezone: "UTC",
+        givingBudgetRemaining: 200,
+        earnedBalance: 0,
+        createdAt: "2024-01-01T00:00:00Z",
+        updatedAt: "2024-01-01T00:00:00Z",
+        deletedAt: null,
+      }
+
+      vi.mocked(usersService.usersService.getUserDetail).mockResolvedValue(
+        mockUser,
+      )
+
+      const result = await usersService.usersService.getUserDetail("1")
+
+      expect(result.id).toBe("1")
+      expect(result.email).toBe("user@test.local")
+    })
+  })
+
+  describe("PUT /users/:id", () => {
     it("should update user", async () => {
       const updatedUser = {
         id: "1",
@@ -102,11 +129,11 @@ describe("Admin Routes", () => {
         deletedAt: null,
       }
 
-      vi.mocked(adminService.adminService.updateUser).mockResolvedValue(
+      vi.mocked(usersService.usersService.updateUser).mockResolvedValue(
         updatedUser,
       )
 
-      const result = await adminService.adminService.updateUser(
+      const result = await usersService.usersService.updateUser(
         "1",
         { role: "ADMIN", givingBudgetRemaining: 300 },
         "admin-id",
@@ -117,12 +144,12 @@ describe("Admin Routes", () => {
     })
 
     it("should prevent self role edit", async () => {
-      vi.mocked(adminService.adminService.updateUser).mockRejectedValue(
+      vi.mocked(usersService.usersService.updateUser).mockRejectedValue(
         new Error("Cannot change your own role"),
       )
 
       await expect(
-        adminService.adminService.updateUser(
+        usersService.usersService.updateUser(
           "user-1",
           { role: "EMPLOYEE" },
           "user-1",
@@ -131,29 +158,29 @@ describe("Admin Routes", () => {
     })
   })
 
-  describe("DELETE /admin/users/:id", () => {
+  describe("DELETE /users/:id", () => {
     it("should soft delete user", async () => {
-      vi.mocked(adminService.adminService.deleteUser).mockResolvedValue(
+      vi.mocked(usersService.usersService.deleteUser).mockResolvedValue(
         undefined,
       )
 
       await expect(
-        adminService.adminService.deleteUser("user-1", "admin-id"),
+        usersService.usersService.deleteUser("user-1", "admin-id"),
       ).resolves.toBeUndefined()
     })
 
     it("should prevent self delete", async () => {
-      vi.mocked(adminService.adminService.deleteUser).mockRejectedValue(
+      vi.mocked(usersService.usersService.deleteUser).mockRejectedValue(
         new Error("Cannot delete your own account"),
       )
 
       await expect(
-        adminService.adminService.deleteUser("user-1", "user-1"),
+        usersService.usersService.deleteUser("user-1", "user-1"),
       ).rejects.toThrow("Cannot delete your own account")
     })
   })
 
-  describe("PATCH /admin/users/:id/reactivate", () => {
+  describe("PATCH /users/:id/reactivate", () => {
     it("should reactivate deleted user", async () => {
       const reactivatedUser = {
         id: "1",
@@ -169,11 +196,11 @@ describe("Admin Routes", () => {
         deletedAt: null,
       }
 
-      vi.mocked(adminService.adminService.reactivateUser).mockResolvedValue(
+      vi.mocked(usersService.usersService.reactivateUser).mockResolvedValue(
         reactivatedUser,
       )
 
-      const result = await adminService.adminService.reactivateUser("1")
+      const result = await usersService.usersService.reactivateUser("1")
 
       expect(result.deletedAt).toBeNull()
     })

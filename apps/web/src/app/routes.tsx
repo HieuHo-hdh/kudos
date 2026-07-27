@@ -4,12 +4,12 @@ import { Navigate, Route, Routes } from "react-router-dom"
 
 import { useCurrentUser } from "../common/hooks/useCurrentUser"
 import { useSocket } from "../common/hooks/useSocket"
-import { ManageUsersPage } from "../features/admin/ManageUsersPage"
 import { LoginPage } from "../features/auth/LoginPage"
 import { RegisterPage } from "../features/auth/RegisterPage"
 import { FeedPage } from "../features/feed/FeedPage"
 import { GiveKudosPage } from "../features/kudos/GiveKudosPage"
 import { RewardsPage } from "../features/rewards/RewardsPage"
+import { ManageUsersPage } from "../features/user/ManageUsersPage"
 
 import { AppShell } from "./layout/AppShell"
 import { AuthLayout } from "./layout/AuthLayout"

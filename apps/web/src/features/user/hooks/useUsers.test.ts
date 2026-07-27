@@ -1,13 +1,13 @@
 import { describe, it, expect, vi } from "vitest"
 
-import * as adminApi from "../admin.api"
+import * as userApi from "../user.api"
 
-vi.mock("../admin.api")
+vi.mock("../user.api")
 
 describe("useUsers - API calls", () => {
-  describe("adminApi.listUsers", () => {
+  describe("userApi.listUsers", () => {
     it("should call listUsers with correct parameters", () => {
-      vi.mocked(adminApi.adminApi.listUsers).mockResolvedValue({
+      vi.mocked(userApi.userApi.listUsers).mockResolvedValue({
         items: [],
         total: 0,
         page: 1,
@@ -15,16 +15,16 @@ describe("useUsers - API calls", () => {
         hasMore: false,
       })
 
-      adminApi.adminApi.listUsers({ page: 1, limit: 20 })
+      userApi.userApi.listUsers({ page: 1, limit: 20 })
 
-      expect(adminApi.adminApi.listUsers).toHaveBeenCalledWith({
+      expect(userApi.userApi.listUsers).toHaveBeenCalledWith({
         page: 1,
         limit: 20,
       })
     })
 
     it("should support search parameter", () => {
-      vi.mocked(adminApi.adminApi.listUsers).mockResolvedValue({
+      vi.mocked(userApi.userApi.listUsers).mockResolvedValue({
         items: [],
         total: 0,
         page: 1,
@@ -32,15 +32,15 @@ describe("useUsers - API calls", () => {
         hasMore: false,
       })
 
-      adminApi.adminApi.listUsers({ page: 1, limit: 20, search: "test" })
+      userApi.userApi.listUsers({ page: 1, limit: 20, search: "test" })
 
-      expect(adminApi.adminApi.listUsers).toHaveBeenCalledWith(
+      expect(userApi.userApi.listUsers).toHaveBeenCalledWith(
         expect.objectContaining({ search: "test" }),
       )
     })
 
     it("should support role filter", () => {
-      vi.mocked(adminApi.adminApi.listUsers).mockResolvedValue({
+      vi.mocked(userApi.userApi.listUsers).mockResolvedValue({
         items: [],
         total: 0,
         page: 1,
@@ -48,15 +48,15 @@ describe("useUsers - API calls", () => {
         hasMore: false,
       })
 
-      adminApi.adminApi.listUsers({ page: 1, limit: 20, role: "ADMIN" })
+      userApi.userApi.listUsers({ page: 1, limit: 20, role: "ADMIN" })
 
-      expect(adminApi.adminApi.listUsers).toHaveBeenCalledWith(
+      expect(userApi.userApi.listUsers).toHaveBeenCalledWith(
         expect.objectContaining({ role: "ADMIN" }),
       )
     })
   })
 
-  describe("adminApi.updateUser", () => {
+  describe("userApi.updateUser", () => {
     it("should call updateUser with id and input", () => {
       const mockUser = {
         id: "1",
@@ -72,27 +72,27 @@ describe("useUsers - API calls", () => {
         deletedAt: null,
       }
 
-      vi.mocked(adminApi.adminApi.updateUser).mockResolvedValue(mockUser)
+      vi.mocked(userApi.userApi.updateUser).mockResolvedValue(mockUser)
 
-      adminApi.adminApi.updateUser("1", { role: "ADMIN" })
+      userApi.userApi.updateUser("1", { role: "ADMIN" })
 
-      expect(adminApi.adminApi.updateUser).toHaveBeenCalledWith("1", {
+      expect(userApi.userApi.updateUser).toHaveBeenCalledWith("1", {
         role: "ADMIN",
       })
     })
   })
 
-  describe("adminApi.deleteUser", () => {
+  describe("userApi.deleteUser", () => {
     it("should call deleteUser with id", () => {
-      vi.mocked(adminApi.adminApi.deleteUser).mockResolvedValue(undefined)
+      vi.mocked(userApi.userApi.deleteUser).mockResolvedValue(undefined)
 
-      adminApi.adminApi.deleteUser("1")
+      userApi.userApi.deleteUser("1")
 
-      expect(adminApi.adminApi.deleteUser).toHaveBeenCalledWith("1")
+      expect(userApi.userApi.deleteUser).toHaveBeenCalledWith("1")
     })
   })
 
-  describe("adminApi.reactivateUser", () => {
+  describe("userApi.reactivateUser", () => {
     it("should call reactivateUser with id", () => {
       const mockUser = {
         id: "1",
@@ -108,11 +108,11 @@ describe("useUsers - API calls", () => {
         deletedAt: null,
       }
 
-      vi.mocked(adminApi.adminApi.reactivateUser).mockResolvedValue(mockUser)
+      vi.mocked(userApi.userApi.reactivateUser).mockResolvedValue(mockUser)
 
-      adminApi.adminApi.reactivateUser("1")
+      userApi.userApi.reactivateUser("1")
 
-      expect(adminApi.adminApi.reactivateUser).toHaveBeenCalledWith("1")
+      expect(userApi.userApi.reactivateUser).toHaveBeenCalledWith("1")
     })
   })
 })

@@ -6,15 +6,15 @@ import {
 
 import { ForbiddenError, NotFoundError } from "../../common/errors"
 
-import * as adminQueries from "./admin.queries"
+import * as usersQueries from "./users.queries"
 
-export const adminService = {
+export const usersService = {
   async listUsers(query: ListUsersQuery) {
-    return adminQueries.listUsers(query)
+    return usersQueries.listUsers(query)
   },
 
   async getUserDetail(id: string) {
-    const user = await adminQueries.findUserById(id)
+    const user = await usersQueries.findUserById(id)
     if (!user) {
       throw new NotFoundError(ErrorCode.NOT_FOUND, `User ${id} not found`)
     }
@@ -22,7 +22,7 @@ export const adminService = {
   },
 
   async updateUser(id: string, input: UpdateUserInput, currentUserId: string) {
-    const user = await adminQueries.findUserById(id)
+    const user = await usersQueries.findUserById(id)
     if (!user) {
       throw new NotFoundError(ErrorCode.NOT_FOUND, `User ${id} not found`)
     }
@@ -41,14 +41,14 @@ export const adminService = {
       throw new Error("Giving budget cannot be negative")
     }
 
-    return adminQueries.updateUser(id, {
+    return usersQueries.updateUser(id, {
       role: input.role,
       givingBudgetRemaining: input.givingBudgetRemaining,
     })
   },
 
   async deleteUser(id: string, currentUserId: string) {
-    const user = await adminQueries.findUserById(id)
+    const user = await usersQueries.findUserById(id)
     if (!user) {
       throw new NotFoundError(ErrorCode.NOT_FOUND, `User ${id} not found`)
     }
@@ -60,17 +60,17 @@ export const adminService = {
       )
     }
 
-    await adminQueries.softDeleteUser(id)
+    await usersQueries.softDeleteUser(id)
   },
 
   async reactivateUser(id: string) {
-    const user = await adminQueries.findDeletedUserById(id)
+    const user = await usersQueries.findDeletedUserById(id)
     if (!user) {
       throw new NotFoundError(
         ErrorCode.NOT_FOUND,
         `User ${id} not found or is not deleted`,
       )
     }
-    return adminQueries.reactivateUser(id)
+    return usersQueries.reactivateUser(id)
   },
 }

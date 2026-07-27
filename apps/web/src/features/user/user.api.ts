@@ -7,7 +7,7 @@ import type {
 
 import { apiFetch } from "../../common/api/client"
 
-export const adminApi = {
+export const userApi = {
   listUsers: (query: ListUsersQuery): Promise<ListUsersResponse> => {
     const params = new URLSearchParams()
     params.append("page", query.page.toString())
@@ -16,22 +16,22 @@ export const adminApi = {
     if (query.active !== undefined)
       params.append("active", query.active.toString())
     if (query.search) params.append("search", query.search)
-    return apiFetch<ListUsersResponse>(`/admin/users?${params}`)
+    return apiFetch<ListUsersResponse>(`/users?${params}`)
   },
 
-  getUserDetail: (id: string) => apiFetch<UserDetail>(`/admin/users/${id}`),
+  getUserDetail: (id: string) => apiFetch<UserDetail>(`/users/${id}`),
 
   updateUser: (id: string, input: UpdateUserInput) =>
-    apiFetch<UserDetail>(`/admin/users/${id}`, {
+    apiFetch<UserDetail>(`/users/${id}`, {
       method: "PUT",
       body: input,
     }),
 
   deleteUser: (id: string) =>
-    apiFetch<void>(`/admin/users/${id}`, { method: "DELETE" }),
+    apiFetch<void>(`/users/${id}`, { method: "DELETE" }),
 
   reactivateUser: (id: string) =>
-    apiFetch<UserDetail>(`/admin/users/${id}/reactivate`, {
+    apiFetch<UserDetail>(`/users/${id}/reactivate`, {
       method: "PATCH",
     }),
 }
