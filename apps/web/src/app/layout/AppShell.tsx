@@ -47,6 +47,18 @@ const NAV_ITEMS: NavItem[] = [
     icon: <UserOutlined />,
     adminOnly: true,
   },
+  {
+    key: "/admin/rewards",
+    label: "Manage Rewards",
+    icon: <GiftOutlined />,
+    adminOnly: true,
+  },
+  {
+    key: "/admin/redemptions",
+    label: "Manage Exchanges",
+    icon: <ShoppingOutlined />,
+    adminOnly: true,
+  },
 ]
 
 export function AppShell() {

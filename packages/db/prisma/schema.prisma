@@ -224,7 +224,8 @@ model Reward {
   costPoints  Int      @map("cost_points")
   imageUrl    String?  @map("image_url")
   isActive    Boolean  @default(true) @map("is_active")
-  stock       Int?
+  isLimited   Boolean  @default(false) @map("is_limited")
+  stock       Int      @default(1)
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
   updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
 

@@ -9,6 +9,7 @@ import { RegisterPage } from "../features/auth/RegisterPage"
 import { FeedPage } from "../features/feed/FeedPage"
 import { GiveKudosPage } from "../features/kudos/GiveKudosPage"
 import { RedeemRewardsPage } from "../features/redeem-rewards/RedeemRewardsPage"
+import { ManageRewardsPage, RedemptionRequestsPage } from "../features/rewards"
 import { ManageUsersPage } from "../features/user/ManageUsersPage"
 
 import { AppShell } from "./layout/AppShell"
@@ -116,6 +117,22 @@ export function AppRoutes() {
           element={
             <AdminOnly>
               <ManageUsersPage />
+            </AdminOnly>
+          }
+        />
+        <Route
+          path="/admin/rewards"
+          element={
+            <AdminOnly>
+              <ManageRewardsPage />
+            </AdminOnly>
+          }
+        />
+        <Route
+          path="/admin/redemptions"
+          element={
+            <AdminOnly>
+              <RedemptionRequestsPage />
             </AdminOnly>
           }
         />
