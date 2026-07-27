@@ -150,8 +150,8 @@ export const rewardsQueries = {
       async (tx) => {
         // Fetch and lock user row (pessimistic locking) to prevent concurrent modifications
         const [userLocked] = await tx.$queryRaw<
-          Array<{ id: string; earnedBalance: number }>
-        >`SELECT id, "earnedBalance" FROM users WHERE id = ${userId} FOR UPDATE`
+          Array<{ id: string; earned_balance: number }>
+        >`SELECT id, "earned_balance" FROM users WHERE id = ${userId}::uuid FOR UPDATE`
 
         if (!userLocked) {
           throw new Error("User not found")
@@ -173,9 +173,9 @@ export const rewardsQueries = {
         }
 
         // Validate user has sufficient points (using locked row data)
-        if (userLocked.earnedBalance < reward.costPoints) {
+        if (userLocked.earned_balance < reward.costPoints) {
           throw new Error(
-            `Insufficient points. You have ${userLocked.earnedBalance} points but need ${reward.costPoints}`,
+            `Insufficient points. You have ${userLocked.earned_balance} points but need ${reward.costPoints}`,
           )
         }
 
@@ -193,7 +193,7 @@ export const rewardsQueries = {
         })
 
         // Deduct points from user
-        const newBalance = user.earnedBalance - reward.costPoints
+        const newBalance = user.earned_balance - reward.costPoints
         await tx.user.update({
           where: { id: userId },
           data: { earnedBalance: newBalance },
@@ -239,12 +239,44 @@ export const rewardsQueries = {
   },
 
   cancelRedemption: async (id: string, cancelReason?: string) => {
-    return db.redemption.update({
-      where: { id },
-      data: {
-        status: "CANCELLED",
-        cancelReason,
-      },
+    return db.$transaction(async (tx) => {
+      // Get redemption details
+      const redemption = await tx.redemption.findUniqueOrThrow({
+        where: { id },
+      })
+
+      // Refund points to user
+      const user = await tx.user.findUniqueOrThrow({
+        where: { id: redemption.userId },
+      })
+
+      const newBalance = user.earnedBalance + redemption.costPoints
+      await tx.user.update({
+        where: { id: redemption.userId },
+        data: { earnedBalance: newBalance },
+      })
+
+      // Create points transaction record for refund
+      await tx.pointsTransaction.create({
+        data: {
+          id: randomUUID(),
+          userId: redemption.userId,
+          type: "REDEEM",
+          amount: redemption.costPoints,
+          balanceAfter: newBalance,
+          redemptionId: redemption.id,
+          note: `Refund: ${cancelReason || "Redemption cancelled"}`,
+        },
+      })
+
+      // Update redemption status
+      return tx.redemption.update({
+        where: { id },
+        data: {
+          status: "CANCELLED",
+          cancelReason,
+        },
+      })
     })
   },
 }

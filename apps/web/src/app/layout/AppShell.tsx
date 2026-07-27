@@ -24,6 +24,7 @@ import { useNavigate, Outlet, useLocation } from "react-router-dom"
 
 import { apiFetch } from "../../common/api/client"
 import { useCurrentUser } from "../../common/hooks/useCurrentUser"
+import { NotificationsDropdown } from "../../features/notifications/components/NotificationsDropdown"
 
 const { Sider, Header, Content } = Layout
 
@@ -131,23 +132,26 @@ export function AppShell() {
           </div>
         </div>
         {me && (
-          <Dropdown
-            menu={{ items: userDropdownItems }}
-            trigger={["click"]}
-            placement="bottomRight"
-          >
-            <Button
-              type="text"
-              className="!px-2 flex items-center gap-2 !h-auto"
+          <div className="flex items-center gap-2">
+            <NotificationsDropdown />
+            <Dropdown
+              menu={{ items: userDropdownItems }}
+              trigger={["click"]}
+              placement="bottomRight"
             >
-              <Avatar
-                size="small"
-                src={me.avatarUrl ?? undefined}
-                icon={<UserOutlined />}
-              />
-              {screens.sm && <span>{me.displayName}</span>}
-            </Button>
-          </Dropdown>
+              <Button
+                type="text"
+                className="!px-2 flex items-center gap-2 !h-auto"
+              >
+                <Avatar
+                  size="small"
+                  src={me.avatarUrl ?? undefined}
+                  icon={<UserOutlined />}
+                />
+                {screens.sm && <span>{me.displayName}</span>}
+              </Button>
+            </Dropdown>
+          </div>
         )}
       </Header>
 

@@ -108,7 +108,7 @@ importers:
         specifier: ^5.0.3
         version: 5.0.5
       socket.io:
-        specifier: ^4.8.0
+        specifier: ^4.8.3
         version: 4.8.3
       uuid:
         specifier: ^10.0.0
@@ -184,7 +184,7 @@ importers:
         specifier: ^6.26.2
         version: 6.30.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       socket.io-client:
-        specifier: ^4.8.0
+        specifier: ^4.8.3
         version: 4.8.3
       zustand:
         specifier: ^4.5.5

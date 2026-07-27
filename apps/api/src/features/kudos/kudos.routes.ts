@@ -5,6 +5,9 @@ import { z } from "zod"
 
 import { sendSuccess, sendEmpty } from "../../common/response"
 import { requireAuth } from "../../middleware/require-auth"
+import { userRoom } from "../../realtime/rooms"
+import { getIO } from "../../realtime/socket-server"
+import { notificationsService } from "../notifications/notifications.service"
 
 import { kudosService } from "./kudos.service"
 
@@ -47,11 +50,41 @@ router.get("/:id", async (req, res, next) => {
 
 router.post("/", requireAuth(), async (req, res, next) => {
   try {
+    const giverId = req.session.userId as string
     const parsed = CreateKudoInputSchema.parse(req.body)
-    const kudo = await kudosService.createKudo(
-      req.session.userId as string,
-      parsed,
-    )
+    const kudo = await kudosService.createKudo(giverId, parsed)
+
+    // Create notification for kudo recipient
+    try {
+      await notificationsService.createNotification(
+        kudo.recipientId,
+        "KUDO_RECEIVED",
+        {
+          kudoId: kudo.id,
+          giverId,
+          message: kudo.message,
+          points: kudo.points,
+        },
+      )
+
+      // Emit real-time notification via Socket.io
+      try {
+        const io = getIO()
+        io.to(userRoom(kudo.recipientId)).emit("notification:new", {
+          type: "KUDO_RECEIVED",
+          kudoId: kudo.id,
+          giverId,
+          message: kudo.message,
+          points: kudo.points,
+        })
+      } catch (socketError) {
+        console.error("Failed to emit socket event:", socketError)
+      }
+    } catch (notificationError) {
+      console.error("Failed to create notification:", notificationError)
+      // Don't fail the request if notification creation fails
+    }
+
     sendSuccess(res, kudo, {
       statusCode: 201,
       message: "Kudo created successfully",

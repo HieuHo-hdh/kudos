@@ -7,6 +7,9 @@ import { redis } from "../../common/redis-client"
 import { sendSuccess } from "../../common/response"
 import { requireAuth } from "../../middleware/require-auth"
 import { requireRole } from "../../middleware/require-role"
+import { userRoom } from "../../realtime/rooms"
+import { getIO } from "../../realtime/socket-server"
+import { notificationsService } from "../notifications/notifications.service"
 
 import { rewardsService } from "./rewards.service"
 
@@ -65,6 +68,39 @@ redemptionsRouter.patch(
       const redemption = await rewardsService.fulfillRedemption(
         req.params.id as string,
       )
+
+      // Create notification for user
+      try {
+        await notificationsService.createNotification(
+          redemption.userId,
+          "REDEMPTION_STATUS",
+          {
+            rewardId: redemption.rewardId,
+            redemptionId: redemption.id,
+            status: "FULFILLED",
+            costPoints: redemption.costPoints,
+          },
+        )
+
+        // Emit real-time notification via Socket.io
+        try {
+          const io = getIO()
+          io.to(userRoom(redemption.userId)).emit("notification:new", {
+            type: "REDEMPTION_STATUS",
+            status: "FULFILLED",
+            redemptionId: redemption.id,
+            costPoints: redemption.costPoints,
+          })
+        } catch (socketError) {
+          console.error("Failed to emit socket event:", socketError)
+        }
+      } catch (notificationError) {
+        console.error(
+          "Failed to create fulfillment notification:",
+          notificationError,
+        )
+      }
+
       sendSuccess(res, redemption, {
         message: "Redemption fulfilled successfully",
       })
@@ -85,6 +121,43 @@ redemptionsRouter.patch(
         req.params.id as string,
         parsed.reason,
       )
+
+      // Create notification for user (points refunded)
+      try {
+        await notificationsService.createNotification(
+          redemption.userId,
+          "REDEMPTION_STATUS",
+          {
+            rewardId: redemption.rewardId,
+            redemptionId: redemption.id,
+            status: "CANCELLED",
+            costPoints: redemption.costPoints,
+            reason: parsed.reason,
+            pointsRefunded: true,
+          },
+        )
+
+        // Emit real-time notification via Socket.io
+        try {
+          const io = getIO()
+          io.to(userRoom(redemption.userId)).emit("notification:new", {
+            type: "REDEMPTION_STATUS",
+            status: "CANCELLED",
+            redemptionId: redemption.id,
+            costPoints: redemption.costPoints,
+            reason: parsed.reason,
+            pointsRefunded: true,
+          })
+        } catch (socketError) {
+          console.error("Failed to emit socket event:", socketError)
+        }
+      } catch (notificationError) {
+        console.error(
+          "Failed to create cancellation notification:",
+          notificationError,
+        )
+      }
+
       sendSuccess(res, redemption, {
         message: "Redemption cancelled successfully",
       })

@@ -11,11 +11,15 @@ import { registerPingHandler } from "./ping.handler"
 import { feedRoom, userRoom } from "./rooms"
 import { authenticateSocket } from "./socket-auth"
 
+let ioInstance: Server | null = null
+
 export function attachSocketServer(httpServer: HttpServer): Server {
   const io = new Server(httpServer, {
     cors: { origin: env.WEB_ORIGIN, credentials: true },
     adapter: createAdapter(redisPub, redisSub),
   })
+
+  ioInstance = io
 
   io.use(async (socket, next) => {
     const auth = await authenticateSocket(socket)
@@ -41,4 +45,11 @@ export function attachSocketServer(httpServer: HttpServer): Server {
   })
 
   return io
+}
+
+export function getIO(): Server {
+  if (!ioInstance) {
+    throw new Error("Socket.io not initialized")
+  }
+  return ioInstance
 }
