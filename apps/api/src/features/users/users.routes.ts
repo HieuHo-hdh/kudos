@@ -1,6 +1,7 @@
 import { ListUsersQuerySchema, UpdateUserInputSchema } from "@kudos/shared"
 import { Router, type Router as RouterType } from "express"
 
+import { sendSuccess, sendEmpty } from "../../common/response"
 import { requireAuth } from "../../middleware/require-auth"
 import { requireRole } from "../../middleware/require-role"
 
@@ -17,7 +18,7 @@ usersRouter.get(
     try {
       const parsed = ListUsersQuerySchema.parse(req.query)
       const result = await usersService.listUsers(parsed)
-      res.json({ data: result })
+      sendSuccess(res, result)
     } catch (e) {
       next(e)
     }
@@ -30,7 +31,7 @@ usersRouter.get(
   async (req, res, next) => {
     try {
       const user = await usersService.getUserDetail(req.params.id as string)
-      res.json({ data: user })
+      sendSuccess(res, user)
     } catch (e) {
       next(e)
     }
@@ -45,7 +46,7 @@ usersRouter.put("/:id", requireRole("ADMIN"), async (req, res, next) => {
       parsed,
       req.session.userId as string,
     )
-    res.json({ data: user })
+    sendSuccess(res, user, { message: "User updated successfully" })
   } catch (e) {
     next(e)
   }
@@ -57,7 +58,7 @@ usersRouter.delete("/:id", requireRole("ADMIN"), async (req, res, next) => {
       req.params.id as string,
       req.session.userId as string,
     )
-    res.status(204).end()
+    sendEmpty(res, { message: "User deleted successfully" })
   } catch (e) {
     next(e)
   }
@@ -69,7 +70,7 @@ usersRouter.patch(
   async (req, res, next) => {
     try {
       const user = await usersService.reactivateUser(req.params.id as string)
-      res.json({ data: user })
+      sendSuccess(res, user, { message: "User reactivated successfully" })
     } catch (e) {
       next(e)
     }
