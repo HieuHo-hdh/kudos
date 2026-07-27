@@ -1,6 +1,6 @@
 import { ClearOutlined, MoreOutlined, ReloadOutlined } from "@ant-design/icons"
 import type { ListUsersQuery, UpdateUserInput, UserDetail } from "@kudos/shared"
-import { App, Button, Card, Divider, Dropdown, Select, Table, Tag } from "antd"
+import { App, Button, Card, Dropdown, Select, Space, Table, Tag } from "antd"
 import { useState } from "react"
 
 import { DebouncedSearch } from "../../common/components/DebouncedSearch"
@@ -187,119 +187,120 @@ export function ManageUsersPage() {
   return (
     <AdminLayout breadcrumbs={[{ title: "Manage Users" }]}>
       <Card>
-        <div className="flex flex-wrap gap-4">
-          <div className="flex-1 flex gap-2 flex-wrap md:flex-nowrap">
-            <DebouncedSearch
-              placeholder="Search by email or name"
-              value={filters.search || ""}
-              onChange={(value) => {
-                const trimmed = value.slice(0, 50)
-                setFilters({ ...filters, search: trimmed || undefined })
-              }}
-              allowClear
-              className="flex-wrap md:max-w-xs"
-              maxLength={50}
-              debounceMs={500}
-            />
-            <Select
-              placeholder="Filter by role"
-              value={filters.role || undefined}
-              onChange={(value) =>
-                setFilters({ ...filters, role: value || undefined })
-              }
-              options={[
-                { label: "Employee", value: "EMPLOYEE" },
-                { label: "Admin", value: "ADMIN" },
-              ]}
-              allowClear
-              className="w-40"
-            />
-            <Select
-              placeholder="Filter by status"
-              value={
-                filters.active === undefined
-                  ? undefined
-                  : filters.active
-                    ? "active"
-                    : "inactive"
-              }
-              onChange={(value) => {
-                if (value === "active") {
-                  setFilters({ ...filters, active: true })
-                } else if (value === "inactive") {
-                  setFilters({ ...filters, active: false })
-                } else {
-                  setFilters({ ...filters, active: undefined })
+        <Space direction="vertical" className="w-full" size="large">
+          <h1 className="text-2xl font-bold">Manage Users</h1>
+          <div className="flex flex-wrap gap-4">
+            <div className="flex-1 flex gap-2 flex-wrap md:flex-nowrap">
+              <DebouncedSearch
+                placeholder="Search by email or name"
+                value={filters.search || ""}
+                onChange={(value) => {
+                  const trimmed = value.slice(0, 50)
+                  setFilters({ ...filters, search: trimmed || undefined })
+                }}
+                allowClear
+                className="flex-wrap md:max-w-xs"
+                maxLength={50}
+                debounceMs={500}
+              />
+              <Select
+                placeholder="Filter by role"
+                value={filters.role || undefined}
+                onChange={(value) =>
+                  setFilters({ ...filters, role: value || undefined })
                 }
-              }}
-              options={[
-                { label: "Active", value: "active" },
-                { label: "Inactive", value: "inactive" },
-              ]}
-              allowClear
-              className="w-40"
-            />
+                options={[
+                  { label: "Employee", value: "EMPLOYEE" },
+                  { label: "Admin", value: "ADMIN" },
+                ]}
+                allowClear
+                className="w-40"
+              />
+              <Select
+                placeholder="Filter by status"
+                value={
+                  filters.active === undefined
+                    ? undefined
+                    : filters.active
+                      ? "active"
+                      : "inactive"
+                }
+                onChange={(value) => {
+                  if (value === "active") {
+                    setFilters({ ...filters, active: true })
+                  } else if (value === "inactive") {
+                    setFilters({ ...filters, active: false })
+                  } else {
+                    setFilters({ ...filters, active: undefined })
+                  }
+                }}
+                options={[
+                  { label: "Active", value: "active" },
+                  { label: "Inactive", value: "inactive" },
+                ]}
+                allowClear
+                className="w-40"
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Button
+                onClick={() => {
+                  setFilters({})
+                  setPagination({ page: 1, limit: 20 })
+                }}
+                icon={<ClearOutlined />}
+              >
+                Clear Filters
+              </Button>
+              <Button
+                onClick={() => refetch()}
+                icon={<ReloadOutlined />}
+                loading={isLoading}
+              >
+                Refresh
+              </Button>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            <Button
-              onClick={() => {
-                setFilters({})
-                setPagination({ page: 1, limit: 20 })
-              }}
-              icon={<ClearOutlined />}
-            >
-              Clear Filters
-            </Button>
-            <Button
-              onClick={() => refetch()}
-              icon={<ReloadOutlined />}
-              loading={isLoading}
-            >
-              Refresh
-            </Button>
-          </div>
-        </div>
+          <Table
+            columns={columns}
+            dataSource={data?.items || []}
+            loading={
+              isLoading ||
+              updateMutation.isPending ||
+              deleteMutation.isPending ||
+              reactivateMutation.isPending
+            }
+            rowKey="id"
+            pagination={{
+              current: pagination.page,
+              pageSize: pagination.limit,
+              total: data?.total || 0,
+              showTotal: (total) => `Total: ${total}`,
+              onChange: (page) => setPagination((prev) => ({ ...prev, page })),
+              showSizeChanger: true,
+              responsive: true,
+              pageSizeOptions: ["10", "20", "50", "100"],
+              onShowSizeChange: (_, pageSize) => {
+                setPagination({ page: 1, limit: pageSize })
+              },
+            }}
+            scroll={{ x: true }}
+          />
 
-        <Divider />
-
-        <Table
-          columns={columns}
-          dataSource={data?.items || []}
-          loading={
-            isLoading ||
-            updateMutation.isPending ||
-            deleteMutation.isPending ||
-            reactivateMutation.isPending
-          }
-          rowKey="id"
-          pagination={{
-            current: pagination.page,
-            pageSize: pagination.limit,
-            total: data?.total || 0,
-            showTotal: (total) => `Total: ${total}`,
-            onChange: (page) => setPagination((prev) => ({ ...prev, page })),
-            showSizeChanger: true,
-            responsive: true,
-            pageSizeOptions: ["10", "20", "50", "100"],
-            onShowSizeChange: (_, pageSize) => {
-              setPagination({ page: 1, limit: pageSize })
-            },
-          }}
-          scroll={{ x: true }}
-        />
-
-        <EditUserModal
-          visible={showEditModal}
-          user={editingUser}
-          currentUserId={currentUser.data?.id || ""}
-          onClose={() => {
-            setShowEditModal(false)
-            setEditingUser(null)
-          }}
-          onSubmit={handleEditSubmit}
-          isLoading={updateMutation.isPending}
-        />
+          <EditUserModal
+            visible={showEditModal}
+            user={editingUser}
+            currentUserId={currentUser.data?.id || ""}
+            onClose={() => {
+              setShowEditModal(false)
+              setEditingUser(null)
+            }}
+            onSubmit={handleEditSubmit}
+            isLoading={updateMutation.isPending}
+          />
+        </Space>
       </Card>
     </AdminLayout>
   )
