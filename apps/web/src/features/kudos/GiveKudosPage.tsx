@@ -1,5 +1,9 @@
-import { Typography } from "antd"
+import { GiveKudoForm } from "./components/GiveKudoForm"
 
 export function GiveKudosPage() {
-  return <Typography.Title level={3}>Give Kudos</Typography.Title>
+  return (
+    <div className="max-w-2xl">
+      <GiveKudoForm />
+    </div>
+  )
 }

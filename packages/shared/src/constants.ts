@@ -14,5 +14,3 @@ export const CORE_VALUES = [
   "CUSTOMER_FIRST",
   "INTEGRITY",
 ] as const
-
-export type CoreValue = (typeof CORE_VALUES)[number]

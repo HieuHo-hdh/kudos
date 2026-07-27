@@ -1,5 +1,5 @@
-import { Typography } from "antd"
+import { FeedPage as KudosFeed } from "../kudos/pages/FeedPage"
 
 export function FeedPage() {
-  return <Typography.Title level={3}>Feed</Typography.Title>
+  return <KudosFeed />
 }

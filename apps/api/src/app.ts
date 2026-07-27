@@ -9,6 +9,7 @@ import helmet from "helmet"
 import { redis } from "./common/redis-client"
 import { authRouter } from "./features/auth/auth.routes"
 import { healthRouter } from "./features/health/health.routes"
+import { kudosRouter } from "./features/kudos/kudos.routes"
 import { usersRouter } from "./features/users/users.routes"
 import { correlationId } from "./middleware/correlation-id"
 import { errorHandler } from "./middleware/error-handler"
@@ -51,6 +52,7 @@ export function createApp(): Express {
   app.use("/health", healthRouter)
   app.use("/auth", authRouter)
   app.use("/users", usersRouter)
+  app.use("/kudos", kudosRouter)
 
   app.use(errorHandler())
   return app

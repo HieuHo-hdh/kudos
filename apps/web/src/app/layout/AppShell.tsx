@@ -1,7 +1,7 @@
 import {
   GiftOutlined,
   HomeOutlined,
-  IdcardOutlined,
+  LikeOutlined,
   LogoutOutlined,
   MenuOutlined,
   ShoppingOutlined,
@@ -34,12 +34,12 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { key: "/", label: "Home", icon: <HomeOutlined /> },
-  { key: "/feed", label: "Feed", icon: <IdcardOutlined /> },
+  { key: "/feed", label: "Kudos", icon: <LikeOutlined /> },
   { key: "/give", label: "Give Kudos", icon: <GiftOutlined /> },
   { key: "/rewards", label: "Rewards", icon: <ShoppingOutlined /> },
   {
     key: "/admin/users",
-    label: "Manage Users",
+    label: "Users",
     icon: <UserOutlined />,
     adminOnly: true,
   },
