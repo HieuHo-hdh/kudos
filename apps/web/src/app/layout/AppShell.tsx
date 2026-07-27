@@ -171,6 +171,7 @@ export function AppShell() {
           <Sider
             style={{ background: "#ffffff" }}
             className="border-r border-gray-200"
+            width={240}
           >
             <Menu
               mode="inline"

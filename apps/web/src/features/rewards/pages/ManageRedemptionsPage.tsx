@@ -143,28 +143,28 @@ export function ManageRedemptionsPage() {
   ]
 
   return (
-    <AdminLayout breadcrumbs={[{ title: "Redemption Requests" }]}>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Redemption Requests</h1>
-      </div>
+    <AdminLayout breadcrumbs={[{ title: "Manage Redemption Requests" }]}>
       <Card>
-        <Table
-          columns={columns}
-          dataSource={data?.items || []}
-          rowKey="id"
-          loading={isLoading}
-          pagination={
-            data?.total
-              ? {
-                  current: pagination.page,
-                  pageSize: pagination.limit,
-                  total: data.total,
-                  onChange: (page: number) =>
-                    setPagination({ ...pagination, page }),
-                }
-              : false
-          }
-        />
+        <Space direction="vertical" className="w-full" size="large">
+          <h1 className="text-2xl font-bold">Manage Redemption Requests</h1>
+          <Table
+            columns={columns}
+            dataSource={data?.items || []}
+            rowKey="id"
+            loading={isLoading}
+            pagination={
+              data?.total
+                ? {
+                    current: pagination.page,
+                    pageSize: pagination.limit,
+                    total: data.total,
+                    onChange: (page: number) =>
+                      setPagination({ ...pagination, page }),
+                  }
+                : false
+            }
+          />
+        </Space>
       </Card>
     </AdminLayout>
   )
