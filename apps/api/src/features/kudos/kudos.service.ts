@@ -1,5 +1,5 @@
 import { ErrorCode, type CreateKudoInput } from "@kudos/shared"
-import { v4 as uuid } from "uuid"
+import { v7 as uuidv7 } from "uuid"
 
 import { ForbiddenError, NotFoundError } from "../../common/errors"
 import { db } from "../../common/prisma-client"
@@ -51,7 +51,7 @@ export const kudosService = {
       )
     }
 
-    const idempotencyKey = uuid()
+    const idempotencyKey = uuidv7()
 
     return await db.$transaction(async (tx) => {
       const kudo = await kudosQueries.kudosQueries.createKudo(
@@ -77,7 +77,7 @@ export const kudosService = {
 
       await tx.pointsTransaction.create({
         data: {
-          id: uuid(),
+          id: uuidv7(),
           userId: input.recipientId,
           type: "RECEIVE",
           amount: input.points,
@@ -88,7 +88,7 @@ export const kudosService = {
 
       await tx.pointsTransaction.create({
         data: {
-          id: uuid(),
+          id: uuidv7(),
           userId,
           type: "GIVE",
           amount: -input.points,

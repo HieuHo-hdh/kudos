@@ -1,5 +1,5 @@
 import type { CoreValue, KudoDetail } from "@kudos/shared"
-import { v4 as uuid } from "uuid"
+import { v7 as uuidv7 } from "uuid"
 
 import { db } from "../../common/prisma-client"
 
@@ -116,7 +116,7 @@ export const kudosQueries = {
   ) {
     const kudo = await db.kudo.create({
       data: {
-        id: uuid(),
+        id: uuidv7(),
         senderId,
         recipientId,
         points,
@@ -177,7 +177,7 @@ export const kudosQueries = {
 
     // Add the new reaction
     await db.reaction.create({
-      data: { id: uuid(), kudoId, userId, emoji },
+      data: { id: uuidv7(), kudoId, userId, emoji },
     })
   },
 
@@ -190,7 +190,7 @@ export const kudosQueries = {
   async addComment(kudoId: string, userId: string, body: string) {
     const comment = await db.comment.create({
       data: {
-        id: uuid(),
+        id: uuidv7(),
         kudoId,
         userId,
         body,
