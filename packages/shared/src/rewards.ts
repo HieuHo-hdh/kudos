@@ -5,7 +5,7 @@ export interface Reward {
   name: string
   description: string
   costPoints: number
-  imageUrl?: string
+  imageUrl?: string | null
   isLimited: boolean
   stock: number
   isActive: boolean
@@ -17,7 +17,7 @@ export interface CreateRewardInput {
   name: string
   description: string
   costPoints: number
-  imageUrl?: string
+  imageUrl?: string | null
   isLimited: boolean
   stock?: number
 }
@@ -26,7 +26,7 @@ export interface UpdateRewardInput {
   name?: string
   description?: string
   costPoints?: number
-  imageUrl?: string
+  imageUrl?: string | null
   isLimited?: boolean
   stock?: number
   isActive?: boolean
@@ -63,7 +63,7 @@ export const CreateRewardInput = z
     name: z.string().min(1, "Name is required"),
     description: z.string().min(1, "Description is required"),
     costPoints: z.number().min(0, "Cost points must be non-negative"),
-    imageUrl: z.string().url().optional(),
+    imageUrl: z.string().url().or(z.literal("")).nullable().optional(),
     isLimited: z.boolean(),
     stock: z.number().min(0, "Stock must be non-negative").optional(),
   })
@@ -80,7 +80,7 @@ export const UpdateRewardInput = z
     name: z.string().min(1).optional(),
     description: z.string().min(1).optional(),
     costPoints: z.number().min(0).optional(),
-    imageUrl: z.string().url().optional(),
+    imageUrl: z.string().url().or(z.literal("")).nullable().optional(),
     isLimited: z.boolean().optional(),
     stock: z.number().min(0).optional(),
     isActive: z.boolean().optional(),

@@ -25,12 +25,16 @@ export function EditRewardModal({
         name: reward.name,
         description: reward.description,
         costPoints: reward.costPoints,
-        imageUrl: reward.imageUrl,
+        imageUrl: reward.imageUrl || null,
         isLimited: reward.isLimited,
         stock: reward.stock,
       })
     } else if (!reward && visible) {
       form.resetFields()
+      form.setFieldsValue({
+        isLimited: false,
+        imageUrl: null,
+      })
     }
   }, [reward, visible, form])
 

@@ -41,7 +41,7 @@ export function GiveKudoForm({
     value: user.id,
   }))
 
-  const debounceTimer = useRef<NodeJS.Timeout>()
+  const debounceTimer = useRef<ReturnType<typeof setTimeout>>()
 
   const handleSearchChange = useCallback((value: string) => {
     if (debounceTimer.current) clearTimeout(debounceTimer.current)
