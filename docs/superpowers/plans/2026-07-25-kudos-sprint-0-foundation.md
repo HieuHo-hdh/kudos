@@ -4260,7 +4260,7 @@ Watch the Actions tab for green. If any step fails, fix locally and push again.
 
 - Create: `apps/web/src/features/feed/FeedPage.tsx`
 - Create: `apps/web/src/features/kudos/GiveKudosPage.tsx`
-- Create: `apps/web/src/features/rewards/RewardsPage.tsx`
+- Create: `apps/web/src/features/redeem-rewards/RedeemRewardsPage.tsx`
 - Create: `apps/web/src/features/admin/ManageUsersPage.tsx`
 - Modify: `apps/web/src/app/layout/AppShell.tsx`
 - Modify: `apps/web/src/app/routes.tsx`

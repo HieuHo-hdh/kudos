@@ -8,7 +8,7 @@ import { LoginPage } from "../features/auth/LoginPage"
 import { RegisterPage } from "../features/auth/RegisterPage"
 import { FeedPage } from "../features/feed/FeedPage"
 import { GiveKudosPage } from "../features/kudos/GiveKudosPage"
-import { RewardsPage } from "../features/rewards/RewardsPage"
+import { RedeemRewardsPage } from "../features/redeem-rewards/RedeemRewardsPage"
 import { ManageUsersPage } from "../features/user/ManageUsersPage"
 
 import { AppShell } from "./layout/AppShell"
@@ -110,7 +110,7 @@ export function AppRoutes() {
         <Route path="/" element={<HomePlaceholder />} />
         <Route path="/feed" element={<FeedPage />} />
         <Route path="/give" element={<GiveKudosPage />} />
-        <Route path="/rewards" element={<RewardsPage />} />
+        <Route path="/redeem-rewards" element={<RedeemRewardsPage />} />
         <Route
           path="/admin/users"
           element={

@@ -36,10 +36,14 @@ const NAV_ITEMS: NavItem[] = [
   { key: "/", label: "Home", icon: <HomeOutlined /> },
   { key: "/feed", label: "Kudos", icon: <LikeOutlined /> },
   { key: "/give", label: "Give Kudos", icon: <GiftOutlined /> },
-  { key: "/rewards", label: "Rewards", icon: <ShoppingOutlined /> },
+  {
+    key: "/redeem-rewards",
+    label: "Redeem Rewards",
+    icon: <ShoppingOutlined />,
+  },
   {
     key: "/admin/users",
-    label: "Users",
+    label: "Manage Users",
     icon: <UserOutlined />,
     adminOnly: true,
   },
