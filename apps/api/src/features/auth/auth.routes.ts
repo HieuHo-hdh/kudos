@@ -1,5 +1,6 @@
 import { Router, type Router as RouterType } from "express"
 
+import { sendSuccess, sendEmpty } from "../../common/response"
 import { requireAuth } from "../../middleware/require-auth"
 import { validate, validated } from "../../middleware/validate"
 
@@ -22,7 +23,10 @@ authRouter.post(
       const me = await authService.register(input)
       req.session.userId = me.id
       req.session.role = me.role
-      res.status(201).json({ data: me })
+      sendSuccess(res, me, {
+        statusCode: 201,
+        message: "Registered successfully",
+      })
     } catch (e) {
       next(e)
     }
@@ -42,7 +46,7 @@ authRouter.post(
         req.session.role = me.role
         req.session.save((err2) => {
           if (err2) return next(err2)
-          res.json({ data: me })
+          sendSuccess(res, me, { message: "Logged in successfully" })
         })
       })
     } catch (e) {
@@ -55,14 +59,14 @@ authRouter.post("/logout", async (req, res, next) => {
   req.session.destroy((err) => {
     if (err) return next(err)
     res.clearCookie("kudos.sid")
-    res.status(204).end()
+    sendEmpty(res, { message: "Logged out successfully" })
   })
 })
 
 authRouter.get("/me", requireAuth(), async (req, res, next) => {
   try {
     const me = await authService.getMe(req.session.userId!)
-    res.json({ data: me })
+    sendSuccess(res, me)
   } catch (e) {
     next(e)
   }

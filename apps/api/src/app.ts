@@ -7,9 +7,12 @@ import session from "express-session"
 import helmet from "helmet"
 
 import { redis } from "./common/redis-client"
-import { adminRouter } from "./features/admin/admin.routes"
 import { authRouter } from "./features/auth/auth.routes"
 import { healthRouter } from "./features/health/health.routes"
+import { kudosRouter } from "./features/kudos/kudos.routes"
+import { notificationsRouter } from "./features/notifications/notifications.routes"
+import { redemptionsRouter } from "./features/rewards/redemptions.routes"
+import { rewardsRouter } from "./features/rewards/rewards.routes"
 import { usersRouter } from "./features/users/users.routes"
 import { correlationId } from "./middleware/correlation-id"
 import { errorHandler } from "./middleware/error-handler"
@@ -52,7 +55,10 @@ export function createApp(): Express {
   app.use("/health", healthRouter)
   app.use("/auth", authRouter)
   app.use("/users", usersRouter)
-  app.use("/admin", adminRouter)
+  app.use("/kudos", kudosRouter)
+  app.use("/notifications", notificationsRouter)
+  app.use("/rewards", rewardsRouter)
+  app.use("/redemptions", redemptionsRouter)
 
   app.use(errorHandler())
   return app

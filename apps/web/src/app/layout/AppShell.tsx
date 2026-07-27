@@ -1,9 +1,11 @@
 import {
   GiftOutlined,
+  HeartOutlined,
   HomeOutlined,
-  IdcardOutlined,
+  LikeOutlined,
   LogoutOutlined,
   MenuOutlined,
+  ShopOutlined,
   ShoppingOutlined,
   UserOutlined,
 } from "@ant-design/icons"
@@ -22,6 +24,7 @@ import { useNavigate, Outlet, useLocation } from "react-router-dom"
 
 import { apiFetch } from "../../common/api/client"
 import { useCurrentUser } from "../../common/hooks/useCurrentUser"
+import { NotificationsDropdown } from "../../features/notifications/components/NotificationsDropdown"
 
 const { Sider, Header, Content } = Layout
 
@@ -34,13 +37,29 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { key: "/", label: "Home", icon: <HomeOutlined /> },
-  { key: "/feed", label: "Feed", icon: <IdcardOutlined /> },
-  { key: "/give", label: "Give Kudos", icon: <GiftOutlined /> },
-  { key: "/rewards", label: "Rewards", icon: <ShoppingOutlined /> },
+  { key: "/kudos", label: "Kudos Feed", icon: <LikeOutlined /> },
+  { key: "/give-kudos", label: "Give Kudos", icon: <HeartOutlined /> },
+  {
+    key: "/redeem-rewards",
+    label: "Redeem Rewards",
+    icon: <GiftOutlined />,
+  },
   {
     key: "/admin/users",
     label: "Manage Users",
     icon: <UserOutlined />,
+    adminOnly: true,
+  },
+  {
+    key: "/admin/rewards",
+    label: "Manage Rewards",
+    icon: <ShopOutlined />,
+    adminOnly: true,
+  },
+  {
+    key: "/admin/redemptions",
+    label: "Manage Redemptions",
+    icon: <ShoppingOutlined />,
     adminOnly: true,
   },
 ]
@@ -113,23 +132,26 @@ export function AppShell() {
           </div>
         </div>
         {me && (
-          <Dropdown
-            menu={{ items: userDropdownItems }}
-            trigger={["click"]}
-            placement="bottomRight"
-          >
-            <Button
-              type="text"
-              className="!px-2 flex items-center gap-2 !h-auto"
+          <div className="flex items-center gap-2">
+            <NotificationsDropdown />
+            <Dropdown
+              menu={{ items: userDropdownItems }}
+              trigger={["click"]}
+              placement="bottomRight"
             >
-              <Avatar
-                size="small"
-                src={me.avatarUrl ?? undefined}
-                icon={<UserOutlined />}
-              />
-              {screens.sm && <span>{me.displayName}</span>}
-            </Button>
-          </Dropdown>
+              <Button
+                type="text"
+                className="!px-2 flex items-center gap-2 !h-auto"
+              >
+                <Avatar
+                  size="small"
+                  src={me.avatarUrl ?? undefined}
+                  icon={<UserOutlined />}
+                />
+                {screens.sm && <span>{me.displayName}</span>}
+              </Button>
+            </Dropdown>
+          </div>
         )}
       </Header>
 
@@ -155,6 +177,7 @@ export function AppShell() {
           <Sider
             style={{ background: "#ffffff" }}
             className="border-r border-gray-200"
+            width={240}
           >
             <Menu
               mode="inline"
