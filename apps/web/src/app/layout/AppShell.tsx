@@ -1,9 +1,11 @@
 import {
   GiftOutlined,
+  HeartOutlined,
   HomeOutlined,
   LikeOutlined,
   LogoutOutlined,
   MenuOutlined,
+  ShopOutlined,
   ShoppingOutlined,
   UserOutlined,
 } from "@ant-design/icons"
@@ -34,12 +36,12 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { key: "/", label: "Home", icon: <HomeOutlined /> },
-  { key: "/kudos", label: "Kudos", icon: <LikeOutlined /> },
-  { key: "/give-kudos", label: "Give Kudos", icon: <GiftOutlined /> },
+  { key: "/kudos", label: "Kudos Feed", icon: <LikeOutlined /> },
+  { key: "/give-kudos", label: "Give Kudos", icon: <HeartOutlined /> },
   {
     key: "/redeem-rewards",
     label: "Redeem Rewards",
-    icon: <ShoppingOutlined />,
+    icon: <GiftOutlined />,
   },
   {
     key: "/admin/users",
@@ -50,7 +52,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     key: "/admin/rewards",
     label: "Manage Rewards",
-    icon: <GiftOutlined />,
+    icon: <ShopOutlined />,
     adminOnly: true,
   },
   {

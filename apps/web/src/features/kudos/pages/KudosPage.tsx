@@ -1,7 +1,8 @@
 import { HeartOutlined } from "@ant-design/icons"
-import { Spin, Empty, Grid, Button } from "antd"
+import { Card, Space, Spin, Empty, Grid, Button } from "antd"
 import { useEffect, useRef, useCallback, useState } from "react"
 
+import { AdminLayout } from "../../user"
 import { GiveKudoModal } from "../components/GiveKudoModal"
 import { KudoCard } from "../components/KudoCard"
 import { useInfiniteKudos } from "../hooks/useInfiniteKudos"
@@ -66,28 +67,35 @@ export function KudosPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <Button
-        onClick={() => setModalOpen(true)}
-        type="primary"
-        icon={<HeartOutlined />}
-      >
-        Give Kudos
-      </Button>
-      <GiveKudoModal open={modalOpen} onClose={() => setModalOpen(false)} />
+    <AdminLayout breadcrumbs={[{ title: "Kudos" }]}>
+      <Card>
+        <Space className="w-full" direction="vertical" size="large">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold">Kudos Feed</h1>
+            <Button
+              onClick={() => setModalOpen(true)}
+              type="primary"
+              icon={<HeartOutlined />}
+            >
+              Give Kudos
+            </Button>
+          </div>
+          <GiveKudoModal open={modalOpen} onClose={() => setModalOpen(false)} />
 
-      <div className={`grid gap-6 grid-cols-${gridCols}`}>
-        {kudos.map((kudo) => (
-          <KudoCard key={kudo.id} kudo={kudo} />
-        ))}
-      </div>
+          <div className={`grid gap-6 grid-cols-${gridCols}`}>
+            {kudos.map((kudo) => (
+              <KudoCard key={kudo.id} kudo={kudo} />
+            ))}
+          </div>
 
-      <div ref={observerTarget} className="py-8 text-center">
-        {isFetchingNextPage && <Spin size="large" />}
-        {!hasNextPage && kudos.length > 0 && (
-          <p className="text-gray-400 text-sm">No more kudos</p>
-        )}
-      </div>
-    </div>
+          <div ref={observerTarget} className="py-8 text-center">
+            {isFetchingNextPage && <Spin size="large" />}
+            {!hasNextPage && kudos.length > 0 && (
+              <p className="text-gray-400 text-sm">No more kudos</p>
+            )}
+          </div>
+        </Space>
+      </Card>
+    </AdminLayout>
   )
 }
