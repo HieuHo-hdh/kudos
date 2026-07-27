@@ -58,4 +58,35 @@ export const kudosApi = {
       method: "DELETE",
     })
   },
+
+  async listComments(kudoId: string) {
+    return apiFetch<
+      Array<{
+        id: string
+        body: string
+        user: {
+          id: string
+          displayName: string
+          email: string
+          avatarUrl: string | null
+        }
+        createdAt: string
+        updatedAt: string
+      }>
+    >(`/kudos/${kudoId}/comments`)
+  },
+
+  async listReactions(kudoId: string) {
+    return apiFetch<
+      Array<{
+        emoji: string
+        user: {
+          id: string
+          displayName: string
+          email: string
+          avatarUrl: string | null
+        }
+      }>
+    >(`/kudos/${kudoId}/reactions`)
+  },
 }

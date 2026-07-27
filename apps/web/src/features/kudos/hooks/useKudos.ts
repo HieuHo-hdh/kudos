@@ -1,5 +1,5 @@
 import type { CreateKudoInput, KudoDetail } from "@kudos/shared"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { kudosApi } from "../kudos.api"
 
@@ -69,5 +69,21 @@ export function useDeleteComment() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["kudos"] })
     },
+  })
+}
+
+export function useListComments(kudoId: string) {
+  return useQuery({
+    queryKey: ["kudos", kudoId, "comments"],
+    queryFn: () => kudosApi.listComments(kudoId),
+    enabled: !!kudoId,
+  })
+}
+
+export function useListReactions(kudoId: string) {
+  return useQuery({
+    queryKey: ["kudos", kudoId, "reactions"],
+    queryFn: () => kudosApi.listReactions(kudoId),
+    enabled: !!kudoId,
   })
 }

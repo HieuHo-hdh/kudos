@@ -10,6 +10,18 @@ export const CoreValueEnum = z.enum([
 
 export type CoreValue = z.infer<typeof CoreValueEnum>
 
+export const ReactionEmojiEnum = z.enum(["❤️", "👍", "🎉", "😂", "😮"])
+
+export type ReactionEmoji = z.infer<typeof ReactionEmojiEnum>
+
+export const REACTION_EMOJIS = {
+  love: "❤️",
+  like: "👍",
+  congratulations: "🎉",
+  laugh: "😂",
+  wow: "😮",
+} as const satisfies Record<string, ReactionEmoji>
+
 export const CreateKudoInputSchema = z.object({
   recipientId: z.string().uuid(),
   points: z.number().int().min(10).max(50),

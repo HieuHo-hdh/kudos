@@ -1,8 +1,9 @@
-import { CreateKudoInputSchema } from "@kudos/shared"
+import { CreateKudoInputSchema, ReactionEmojiEnum } from "@kudos/shared"
 import type { Router as ExpressRouter } from "express"
 import { Router } from "express"
 import { z } from "zod"
 
+import { sendSuccess, sendEmpty } from "../../common/response"
 import { requireAuth } from "../../middleware/require-auth"
 
 import { kudosService } from "./kudos.service"
@@ -15,7 +16,7 @@ const listQuerySchema = z.object({
 })
 
 const reactionSchema = z.object({
-  emoji: z.string().emoji(),
+  emoji: ReactionEmojiEnum,
 })
 
 const commentSchema = z.object({
@@ -29,7 +30,7 @@ router.get("/", async (req, res, next) => {
       parsed.limit,
       parsed.cursor as string | undefined,
     )
-    res.json({ data: result })
+    sendSuccess(res, result)
   } catch (e) {
     next(e)
   }
@@ -38,7 +39,7 @@ router.get("/", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   try {
     const kudo = await kudosService.getKudoDetail(req.params.id as string)
-    res.json({ data: kudo })
+    sendSuccess(res, kudo)
   } catch (e) {
     next(e)
   }
@@ -51,7 +52,10 @@ router.post("/", requireAuth(), async (req, res, next) => {
       req.session.userId as string,
       parsed,
     )
-    res.status(201).json({ data: kudo })
+    sendSuccess(res, kudo, {
+      statusCode: 201,
+      message: "Kudo created successfully",
+    })
   } catch (e) {
     next(e)
   }
@@ -63,7 +67,7 @@ router.delete("/:id", requireAuth(), async (req, res, next) => {
       req.params.id as string,
       req.session.userId as string,
     )
-    res.status(204).end()
+    sendEmpty(res, { message: "Kudo deleted successfully" })
   } catch (e) {
     next(e)
   }
@@ -77,7 +81,10 @@ router.post("/:id/reactions", requireAuth(), async (req, res, next) => {
       req.session.userId as string,
       parsed.emoji,
     )
-    res.status(201).end()
+    sendEmpty(res, {
+      statusCode: 201,
+      message: "Reaction added successfully",
+    })
   } catch (e) {
     next(e)
   }
@@ -93,12 +100,30 @@ router.delete(
         req.session.userId as string,
         req.params.emoji as string,
       )
-      res.status(204).end()
+      sendEmpty(res, { message: "Reaction removed successfully" })
     } catch (e) {
       next(e)
     }
   },
 )
+
+router.get("/:id/reactions", async (req, res, next) => {
+  try {
+    const reactions = await kudosService.listReactions(req.params.id as string)
+    sendSuccess(res, reactions)
+  } catch (e) {
+    next(e)
+  }
+})
+
+router.get("/:id/comments", async (req, res, next) => {
+  try {
+    const comments = await kudosService.listComments(req.params.id as string)
+    sendSuccess(res, comments)
+  } catch (e) {
+    next(e)
+  }
+})
 
 router.post("/:id/comments", requireAuth(), async (req, res, next) => {
   try {
@@ -108,7 +133,10 @@ router.post("/:id/comments", requireAuth(), async (req, res, next) => {
       req.session.userId as string,
       parsed.body,
     )
-    res.status(201).json({ data: comment })
+    sendSuccess(res, comment, {
+      statusCode: 201,
+      message: "Comment added successfully",
+    })
   } catch (e) {
     next(e)
   }
@@ -123,7 +151,7 @@ router.delete(
         req.params.commentId as string,
         req.session.userId as string,
       )
-      res.status(204).end()
+      sendEmpty(res, { message: "Comment deleted successfully" })
     } catch (e) {
       next(e)
     }

@@ -170,10 +170,14 @@ export const kudosQueries = {
   },
 
   async addReaction(kudoId: string, userId: string, emoji: string) {
-    await db.reaction.upsert({
-      where: { kudoId_userId_emoji: { kudoId, userId, emoji } },
-      create: { id: uuid(), kudoId, userId, emoji },
-      update: {},
+    // Remove any existing reactions from this user on this kudo
+    await db.reaction.deleteMany({
+      where: { kudoId, userId },
+    })
+
+    // Add the new reaction
+    await db.reaction.create({
+      data: { id: uuid(), kudoId, userId, emoji },
     })
   },
 
@@ -200,5 +204,52 @@ export const kudosQueries = {
       where: { id: commentId },
       data: { deletedAt: new Date() },
     })
+  },
+
+  async listComments(kudoId: string) {
+    const comments = await db.comment.findMany({
+      where: { kudoId, deletedAt: null },
+      include: {
+        user: {
+          select: {
+            id: true,
+            displayName: true,
+            email: true,
+            avatarUrl: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    })
+
+    return comments.map((comment) => ({
+      id: comment.id,
+      body: comment.body,
+      user: comment.user,
+      createdAt: comment.createdAt.toISOString(),
+      updatedAt: comment.updatedAt.toISOString(),
+    }))
+  },
+
+  async listReactions(kudoId: string) {
+    const reactions = await db.reaction.findMany({
+      where: { kudoId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            displayName: true,
+            email: true,
+            avatarUrl: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    })
+
+    return reactions.map((reaction) => ({
+      emoji: reaction.emoji,
+      user: reaction.user,
+    }))
   },
 }

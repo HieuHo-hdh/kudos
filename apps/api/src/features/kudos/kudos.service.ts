@@ -186,4 +186,30 @@ export const kudosService = {
 
     await kudosQueries.kudosQueries.deleteComment(commentId)
   },
+
+  async listComments(kudoId: string) {
+    const kudo = await db.kudo.findUnique({
+      where: { id: kudoId },
+      select: { deletedAt: true },
+    })
+
+    if (!kudo || kudo.deletedAt) {
+      throw new NotFoundError(ErrorCode.NOT_FOUND, `Kudo ${kudoId} not found`)
+    }
+
+    return kudosQueries.kudosQueries.listComments(kudoId)
+  },
+
+  async listReactions(kudoId: string) {
+    const kudo = await db.kudo.findUnique({
+      where: { id: kudoId },
+      select: { deletedAt: true },
+    })
+
+    if (!kudo || kudo.deletedAt) {
+      throw new NotFoundError(ErrorCode.NOT_FOUND, `Kudo ${kudoId} not found`)
+    }
+
+    return kudosQueries.kudosQueries.listReactions(kudoId)
+  },
 }
