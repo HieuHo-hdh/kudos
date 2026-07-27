@@ -5,6 +5,7 @@ import { rewardsApi } from "../rewards.api"
 
 const REDEMPTIONS_KEY = "redemptions"
 const REWARDS_KEY = "rewards"
+const USER_KEY = "user"
 
 export function useRedemptionsList(query: ListRedemptionsQuery) {
   return useQuery({
@@ -24,10 +25,15 @@ export function useCreateRedemption() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (rewardId: string) => rewardsApi.createRedemption(rewardId),
+    mutationFn: async (rewardId: string) => {
+      // Get server-issued idempotency key
+      const { idempotencyKey } = await rewardsApi.issueIdempotencyKey()
+      return rewardsApi.createRedemption(rewardId, idempotencyKey)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [REDEMPTIONS_KEY] })
       queryClient.invalidateQueries({ queryKey: [REWARDS_KEY] })
+      queryClient.invalidateQueries({ queryKey: [USER_KEY] })
     },
   })
 }

@@ -38,8 +38,16 @@ export const rewardsService = {
     return rewardsQueries.listUserRedemptions(userId, query)
   },
 
-  createRedemption: (userId: string, rewardId: string) => {
-    return rewardsQueries.createRedemption(userId, rewardId, randomUUID())
+  createRedemption: (
+    userId: string,
+    rewardId: string,
+    idempotencyKey?: string,
+  ) => {
+    return rewardsQueries.createRedemption(
+      userId,
+      rewardId,
+      idempotencyKey || randomUUID(),
+    )
   },
 
   fulfillRedemption: (id: string) => {

@@ -131,24 +131,101 @@ export const rewardsQueries = {
     rewardId: string,
     idempotencyKey: string,
   ) => {
-    const reward = await db.reward.findUniqueOrThrow({
-      where: { id: rewardId },
-    })
-
-    // Only check stock availability if reward is limited
-    if (reward.isLimited && reward.stock <= 0) {
-      throw new Error("This reward is out of stock")
-    }
-
-    return db.redemption.create({
-      data: {
-        id: randomUUID(),
-        userId,
-        rewardId,
-        costPoints: reward.costPoints,
-        idempotencyKey,
+    // Check for idempotency - return existing redemption if already processed
+    const existing = await db.redemption.findUnique({
+      where: {
+        userId_idempotencyKey: {
+          userId,
+          idempotencyKey,
+        },
       },
     })
+
+    if (existing) {
+      return existing
+    }
+
+    // Use transaction with serializable isolation to prevent race conditions
+    return db.$transaction(
+      async (tx) => {
+        // Fetch and lock user row (pessimistic locking) to prevent concurrent modifications
+        const [userLocked] = await tx.$queryRaw<
+          Array<{ id: string; earnedBalance: number }>
+        >`SELECT id, "earnedBalance" FROM users WHERE id = ${userId} FOR UPDATE`
+
+        if (!userLocked) {
+          throw new Error("User not found")
+        }
+
+        // Fetch reward
+        const reward = await tx.reward.findUniqueOrThrow({
+          where: { id: rewardId },
+        })
+
+        // Validate reward is active
+        if (!reward.isActive) {
+          throw new Error("This reward is no longer available")
+        }
+
+        // Check stock availability if reward is limited
+        if (reward.isLimited && reward.stock <= 0) {
+          throw new Error("This reward is out of stock")
+        }
+
+        // Validate user has sufficient points (using locked row data)
+        if (userLocked.earnedBalance < reward.costPoints) {
+          throw new Error(
+            `Insufficient points. You have ${userLocked.earnedBalance} points but need ${reward.costPoints}`,
+          )
+        }
+
+        const user = userLocked
+
+        // Create redemption
+        const redemption = await tx.redemption.create({
+          data: {
+            id: randomUUID(),
+            userId,
+            rewardId,
+            costPoints: reward.costPoints,
+            idempotencyKey,
+          },
+        })
+
+        // Deduct points from user
+        const newBalance = user.earnedBalance - reward.costPoints
+        await tx.user.update({
+          where: { id: userId },
+          data: { earnedBalance: newBalance },
+        })
+
+        // Create points transaction record
+        await tx.pointsTransaction.create({
+          data: {
+            id: randomUUID(),
+            userId,
+            type: "REDEEM",
+            amount: -reward.costPoints,
+            balanceAfter: newBalance,
+            redemptionId: redemption.id,
+            note: `Redeemed: ${reward.name}`,
+          },
+        })
+
+        // Decrease stock if reward is limited
+        if (reward.isLimited) {
+          await tx.reward.update({
+            where: { id: rewardId },
+            data: { stock: reward.stock - 1 },
+          })
+        }
+
+        return redemption
+      },
+      {
+        isolationLevel: "Serializable",
+      },
+    )
   },
 
   fulfillRedemption: async (id: string) => {

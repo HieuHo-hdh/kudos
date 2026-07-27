@@ -11,6 +11,12 @@ import type {
 import { apiFetch } from "../../common/api/client"
 
 export const rewardsApi = {
+  issueIdempotencyKey: async () => {
+    return apiFetch<{ idempotencyKey: string }>("/redemptions/issue-key", {
+      method: "POST",
+    })
+  },
+
   listRewards: async (query: ListRewardsQuery) => {
     const params = new URLSearchParams({
       page: query.page.toString(),
@@ -76,10 +82,10 @@ export const rewardsApi = {
     }>(`/redemptions/my-redemptions?${params.toString()}`)
   },
 
-  createRedemption: async (rewardId: string) => {
+  createRedemption: async (rewardId: string, idempotencyKey: string) => {
     return apiFetch<Redemption>(`/redemptions/${rewardId}/redeem`, {
       method: "POST",
-      body: {},
+      headers: { "Idempotency-Key": idempotencyKey },
     })
   },
 
