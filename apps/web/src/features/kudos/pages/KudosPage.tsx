@@ -6,7 +6,7 @@ import { GiveKudoModal } from "../components/GiveKudoModal"
 import { KudoCard } from "../components/KudoCard"
 import { useInfiniteKudos } from "../hooks/useInfiniteKudos"
 
-export function FeedPage() {
+export function KudosPage() {
   const screens = Grid.useBreakpoint()
   const [modalOpen, setModalOpen] = useState(false)
   const {

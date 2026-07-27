@@ -4,13 +4,11 @@ import { Navigate, Route, Routes } from "react-router-dom"
 
 import { useCurrentUser } from "../common/hooks/useCurrentUser"
 import { useSocket } from "../common/hooks/useSocket"
-import { LoginPage } from "../features/auth/LoginPage"
-import { RegisterPage } from "../features/auth/RegisterPage"
-import { FeedPage } from "../features/feed/FeedPage"
-import { GiveKudosPage } from "../features/kudos/GiveKudosPage"
-import { RedeemRewardsPage } from "../features/redeem-rewards/RedeemRewardsPage"
-import { ManageRewardsPage, RedemptionRequestsPage } from "../features/rewards"
-import { ManageUsersPage } from "../features/user/ManageUsersPage"
+import { LoginPage, RegisterPage } from "../features/auth"
+import { KudosPage, GiveKudosPage } from "../features/kudos"
+import { RedeemRewardsPage } from "../features/redeem-rewards"
+import { ManageRewardsPage, ManageRedemptionsPage } from "../features/rewards"
+import { ManageUsersPage } from "../features/user"
 
 import { AppShell } from "./layout/AppShell"
 import { AuthLayout } from "./layout/AuthLayout"
@@ -109,8 +107,8 @@ export function AppRoutes() {
         }
       >
         <Route path="/" element={<HomePlaceholder />} />
-        <Route path="/feed" element={<FeedPage />} />
-        <Route path="/give" element={<GiveKudosPage />} />
+        <Route path="/kudos" element={<KudosPage />} />
+        <Route path="/give-kudos" element={<GiveKudosPage />} />
         <Route path="/redeem-rewards" element={<RedeemRewardsPage />} />
         <Route
           path="/admin/users"
@@ -132,7 +130,7 @@ export function AppRoutes() {
           path="/admin/redemptions"
           element={
             <AdminOnly>
-              <RedemptionRequestsPage />
+              <ManageRedemptionsPage />
             </AdminOnly>
           }
         />

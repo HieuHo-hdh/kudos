@@ -2,9 +2,8 @@ import { Alert, Button, Form, Input, Typography } from "antd"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
-import { ApiError } from "../../common/api/errors"
-
-import { useRegister } from "./useAuth"
+import { ApiError } from "../../../common/api/errors"
+import { useRegister } from "../hooks/useAuth"
 
 type Values = { email: string; displayName: string; password: string }
 

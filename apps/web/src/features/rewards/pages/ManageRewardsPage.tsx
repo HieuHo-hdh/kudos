@@ -9,8 +9,8 @@ import { App, Button, Card, Dropdown, Select, Space, Table, Tag } from "antd"
 import { useState } from "react"
 
 import { DebouncedSearch } from "../../../common/components/DebouncedSearch"
-import { AdminLayout } from "../../user/AdminLayout"
-import { EditRewardModal } from "../EditRewardModal"
+import { AdminLayout } from "../../user/components/AdminLayout"
+import { EditRewardModal } from "../components/EditRewardModal"
 import {
   useCreateReward,
   useDeleteReward,

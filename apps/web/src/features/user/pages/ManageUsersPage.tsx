@@ -3,17 +3,16 @@ import type { ListUsersQuery, UpdateUserInput, UserDetail } from "@kudos/shared"
 import { App, Button, Card, Dropdown, Select, Space, Table, Tag } from "antd"
 import { useState } from "react"
 
-import { DebouncedSearch } from "../../common/components/DebouncedSearch"
-import { useCurrentUser } from "../../common/hooks/useCurrentUser"
-
-import { AdminLayout } from "./AdminLayout"
-import { EditUserModal } from "./EditUserModal"
+import { DebouncedSearch } from "../../../common/components/DebouncedSearch"
+import { useCurrentUser } from "../../../common/hooks/useCurrentUser"
+import { AdminLayout } from "../components/AdminLayout"
+import { EditUserModal } from "../components/EditUserModal"
 import {
   useDeleteUser,
   useReactivateUser,
   useUpdateUser,
   useUsersList,
-} from "./hooks/useUsers"
+} from "../hooks/useUsers"
 
 export function ManageUsersPage() {
   const currentUser = useCurrentUser()

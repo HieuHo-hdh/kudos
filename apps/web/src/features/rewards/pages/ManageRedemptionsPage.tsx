@@ -3,14 +3,14 @@ import type { ListRewardsQuery, Redemption } from "@kudos/shared"
 import { App, Button, Card, Space, Table, Tag } from "antd"
 import { useState } from "react"
 
-import { AdminLayout } from "../../user/AdminLayout"
+import { AdminLayout } from "../../user/components/AdminLayout"
 import {
   useCancelRedemption,
   useFulfillRedemption,
   useRedemptionsList,
 } from "../hooks/useRedemptions"
 
-export function RedemptionRequestsPage() {
+export function ManageRedemptionsPage() {
   const { message, modal } = App.useApp()
 
   const [pagination, setPagination] = useState({ page: 1, limit: 20 })

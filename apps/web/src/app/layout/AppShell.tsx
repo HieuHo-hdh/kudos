@@ -34,8 +34,8 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { key: "/", label: "Home", icon: <HomeOutlined /> },
-  { key: "/feed", label: "Kudos", icon: <LikeOutlined /> },
-  { key: "/give", label: "Give Kudos", icon: <GiftOutlined /> },
+  { key: "/kudos", label: "Kudos", icon: <LikeOutlined /> },
+  { key: "/give-kudos", label: "Give Kudos", icon: <GiftOutlined /> },
   {
     key: "/redeem-rewards",
     label: "Redeem Rewards",
@@ -55,7 +55,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     key: "/admin/redemptions",
-    label: "Manage Exchanges",
+    label: "Manage Redemptions",
     icon: <ShoppingOutlined />,
     adminOnly: true,
   },

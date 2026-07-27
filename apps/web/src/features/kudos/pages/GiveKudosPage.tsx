@@ -1,4 +1,4 @@
-import { GiveKudoForm } from "./components/GiveKudoForm"
+import { GiveKudoForm } from "../components/GiveKudoForm"
 
 export function GiveKudosPage() {
   return (
