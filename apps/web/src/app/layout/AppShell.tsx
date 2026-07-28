@@ -1,7 +1,6 @@
 import {
   GiftOutlined,
   HeartOutlined,
-  HomeOutlined,
   LikeOutlined,
   LogoutOutlined,
   MenuOutlined,
@@ -36,7 +35,6 @@ type NavItem = {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { key: "/", label: "Home", icon: <HomeOutlined /> },
   { key: "/kudos", label: "Kudos Feed", icon: <LikeOutlined /> },
   { key: "/give-kudos", label: "Give Kudos", icon: <HeartOutlined /> },
   {
