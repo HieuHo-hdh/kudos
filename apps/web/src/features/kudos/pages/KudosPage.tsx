@@ -62,10 +62,6 @@ export function KudosPage() {
 
   const kudos = data?.pages.flatMap((page) => page.items) ?? []
 
-  if (kudos.length === 0) {
-    return <Empty description="No kudos yet" style={{ marginTop: 60 }} />
-  }
-
   return (
     <AdminLayout breadcrumbs={[{ title: "Kudos" }]}>
       <Card>
@@ -80,20 +76,28 @@ export function KudosPage() {
               Give Kudos
             </Button>
           </div>
-          <GiveKudoModal open={modalOpen} onClose={() => setModalOpen(false)} />
+          {kudos?.length > 0 ? (
+            <>
+              <GiveKudoModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+              />
+              <div className={`grid gap-6 grid-cols-${gridCols}`}>
+                {kudos.map((kudo) => (
+                  <KudoCard key={kudo.id} kudo={kudo} />
+                ))}
+              </div>
 
-          <div className={`grid gap-6 grid-cols-${gridCols}`}>
-            {kudos.map((kudo) => (
-              <KudoCard key={kudo.id} kudo={kudo} />
-            ))}
-          </div>
-
-          <div ref={observerTarget} className="py-8 text-center">
-            {isFetchingNextPage && <Spin size="large" />}
-            {!hasNextPage && kudos.length > 0 && (
-              <p className="text-gray-400 text-sm">No more kudos</p>
-            )}
-          </div>
+              <div ref={observerTarget} className="py-8 text-center">
+                {isFetchingNextPage && <Spin size="large" />}
+                {!hasNextPage && kudos.length > 0 && (
+                  <p className="text-gray-400 text-sm">No more kudos</p>
+                )}
+              </div>
+            </>
+          ) : (
+            <Empty description="No kudos yet" style={{ marginTop: 60 }} />
+          )}
         </Space>
       </Card>
     </AdminLayout>
